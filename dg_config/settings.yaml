@@ -1,0 +1,100 @@
+# OAuth2 configuration
+###############################################################################
+# The below configuration parameters are used to authenticate using the       #
+# recommended OAuth2 flow. For more information on authenticating with OAuth2 #
+# see: https://developers.google.com/google-ads/api/docs/oauth/overview       #
+###############################################################################
+
+developer_token: {Enter Your Own Value Here}
+client_id: {Enter Your Own Value Here}
+client_secret: {Enter Your Own Value Here}
+refresh_token: {Enter Your Own Value Here}
+
+# Login customer ID configuration
+###############################################################################
+# Required for manager accounts only: Specify the login customer ID used to   #
+# authenticate API calls. This will be the customer ID of the authenticated   #
+# manager account. It should be set without dashes, for example: 1234567890   #
+# instead of 123-456-7890. You can also specify this later in code if your    #
+# application uses multiple manager account + OAuth pairs.                    #
+###############################################################################
+login_customer_id: {Enter Your Own Value Here}
+
+
+# Custom Config
+###############################################################################
+#                    AdWords customer Accounts                                #
+###############################################################################
+google_accounts:
+  - {Enter Your Own Value Here}
+  - {Enter Your Own Value Here}
+  - {Enter Your Own Value Here}
+  - {Enter Your Own Value Here}
+  - {Enter Your Own Value Here}
+  - {Enter Your Own Value Here}
+  - {Enter Your Own Value Here}
+  - {Enter Your Own Value Here}
+  - {Enter Your Own Value Here}
+  - {Enter Your Own Value Here}
+  - {Enter Your Own Value Here}
+  - {Enter Your Own Value Here}
+  - {Enter Your Own Value Here}
+  - {Enter Your Own Value Here}
+  - {Enter Your Own Value Here}
+
+###############################################################################
+#                      Bing customer Accounts                                #
+###############################################################################
+microsoft_accounts:
+  - {Enter Your Own Value Here}
+  - {Enter Your Own Value Here}
+  - {Enter Your Own Value Here}
+  - {Enter Your Own Value Here}
+  - {Enter Your Own Value Here}
+  - {Enter Your Own Value Here}
+  - {Enter Your Own Value Here}
+  - {Enter Your Own Value Here}
+  - {Enter Your Own Value Here}
+  - {Enter Your Own Value Here}
+  - {Enter Your Own Value Here}
+  - {Enter Your Own Value Here}
+  - {Enter Your Own Value Here}
+  - {Enter Your Own Value Here}
+
+###############################################################################
+#                        Bing Report Settings                                 #
+###############################################################################
+microsoft_report_format : Csv                       # Needs to be title case.
+microsoft_developer_token : {Enter Your Own Value Here}
+microsoft_environment : production
+microsoft_client_id : {Enter Your Own Value Here}
+microsoft_client_state : ChangeThisInFuture
+microsoft_refresh_token : ./dg_config/refresh.txt
+microsoft_file_directory : dg_microsoft/reports/
+
+
+
+
+
+##############################################################################
+#                         Database Details                                   #
+#                  Uncomment if running locally                              #
+##############################################################################
+db_host : localhost
+db_database : {Enter Your Own Value Here}
+db_user : {Enter Your Own Value Here}
+db_password : {Enter Your Own Value Here}
+
+
+
+###############################################################################
+#                        Email/SMTP Details                                   #
+###############################################################################
+subject : This is the subject
+body : This is the body
+sender_email : {Enter Your Own Email Address Here}
+receiver_email : {Enter Your Own Value for a Recipient Here}
+password : {Enter Your Own Value Here}
+sender_label : {Enter Your Own Value Here}
+bcc_email : {Enter Your Own Value Here}
+
