@@ -3,4 +3,4 @@
 /backups/
 /dg_config/settings.dev.yaml
 /dg_config/refresh.txt
-/dg_microsoft/reports
+/dg_microsoft/reports/result.csv
