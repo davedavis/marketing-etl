@@ -1,3 +1,5 @@
 # Project exclude paths
 /venv/
 /backups/
+/dg_config/settings.dev.yaml
+/dg_config/refresh.txt
