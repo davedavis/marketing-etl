@@ -22,13 +22,14 @@ from dg_date import daterange
 from dg_microsoft import microsoft_ads_campaign_report
 
 
-settings = get_settings()
 
+settings = get_settings()
 
 def main(quarter):
     """ Main method that calls all the worker modules """
     print('Tracker Running...')
     print(f"Running for {quarter} quarter")
+
 
     # ToDo: Truncate and handle database stuff.
 

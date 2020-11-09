@@ -1,6 +1,7 @@
 import mysql
 from suds import WebFault
 
+from dg_db.db_write import write_microsoft_campaign_report
 from dg_microsoft.base_reports.auth import *
 from bingads.v13.reporting import *
 
@@ -132,26 +133,28 @@ def download_report(reporting_params):
         # Add the tuple to the list
         records_to_insert.append(single_record_for_insertion)
 
-        # Get a DB object from the dg_db package storage connect method.
-    try:
-        connection = storage.connect()
+    #     # Get a DB object from the dg_db package storage connect method.
+    # try:
+    #     connection = storage.connect()
+    #
+    #     my_sql_insert_query = """INSERT INTO Bing_QTD_Account_Report (TimePeriod, AccountNumber, AccountName, Impressions, Clicks, Spend, Week)
+    #                              VALUES (%s, %s, %s, %s, %s, %s, %s) """
+    #
+    #     cursor = connection.cursor()
+    #     cursor.executemany(my_sql_insert_query, records_to_insert)
+    #     connection.commit()
+    #     print(cursor.rowcount, "Record inserted successfully into Bing_QTD_Account_Report table")
+    #
+    # except mysql.connector.Error as error:
+    #     print("Failed to insert record into MySQL table {}".format(error))
+    #
+    # finally:
+    #     if connection.is_connected():
+    #         cursor.close()
+    #         connection.close()
+    #         print("MySQL connection is closed")
 
-        my_sql_insert_query = """INSERT INTO Bing_QTD_Account_Report (TimePeriod, AccountNumber, AccountName, Impressions, Clicks, Spend, Week)
-                                 VALUES (%s, %s, %s, %s, %s, %s, %s) """
-
-        cursor = connection.cursor()
-        cursor.executemany(my_sql_insert_query, records_to_insert)
-        connection.commit()
-        print(cursor.rowcount, "Record inserted successfully into Bing_QTD_Account_Report table")
-
-    except mysql.connector.Error as error:
-        print("Failed to insert record into MySQL table {}".format(error))
-
-    finally:
-        if connection.is_connected():
-            cursor.close()
-            connection.close()
-            print("MySQL connection is closed")
+    write_microsoft_campaign_report(records_to_insert)
 
     # Be sure to close the report.
 

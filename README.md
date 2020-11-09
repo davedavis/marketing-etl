@@ -11,6 +11,14 @@ Currently, it supports spend, revenue, ROAS/E:R, Conversion Rate and CTR.
 - [x] Refactor auth
 - [x] Refactor settings
 - [ ] Refactor DB write
+- [ ] Refactor Account, Campaign and Ads reports.
+
+# Google Refactor
+- [ ] Refactor queries as parameters for reports
+
+
+# Adobe Refactor
+- [ ] Refactor report file programmatically
 
 ### Supplemental Requirements
 - Must be stateless.

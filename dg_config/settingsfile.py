@@ -26,7 +26,7 @@ def get_settings():
             settings_file = yaml.load(f, Loader=yaml.SafeLoader)
             selected_settings = dict(settings_file)
     else:
-        with open('dg_config/settings.yaml', 'r') as f:
+        with open('dg_config/settings.dev.yaml', 'r') as f:
             settings_file = yaml.load(f, Loader=yaml.SafeLoader)
             selected_settings = dict(settings_file)
 

@@ -17,14 +17,17 @@ import mysql
 import yaml
 from mysql.connector import connection
 
-with open('./dg_config/settings.yaml', 'r') as f:
-    yaml_file = yaml.load(f, Loader=yaml.SafeLoader)
-config = dict(yaml_file)
+# Init settings
+from dg_config import settingsfile
+
+settings = settingsfile.get_settings()
+
 
 
 def connect():
-    global_connection = mysql.connector.connect(host=config['db_host'],
-                                                database=config['db_database'],
-                                                user=config['db_user'],
-                                                password=config['db_password'])
+    global_connection = mysql.connector.connect(host=settings['db_host'],
+                                                user=settings['db_user'],
+                                                password=settings['db_password'],
+                                                database=settings['db_database']
+                                                )
     return global_connection
