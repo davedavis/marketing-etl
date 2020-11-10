@@ -19,7 +19,7 @@ import argparse
 import dg_microsoft
 from dg_config.settingsfile import get_settings
 from dg_date import daterange
-from dg_microsoft import microsoft_ads_campaign_report
+from dg_microsoft import microsoft_ads_report_builder
 
 
 
@@ -51,7 +51,7 @@ def main(quarter):
 
     # Get Microsoft Ads reports
     # ToDo: Implement using direct call to date range function (move into if statement)
-    microsoft_ads_campaign_report.get_campaign_report(bing_date_range_start, bing_date_range_end)
+    microsoft_ads_report_builder.get_report(bing_date_range_start, bing_date_range_end)
 
 
 if __name__ == "__main__":
