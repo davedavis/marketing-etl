@@ -19,19 +19,17 @@ import argparse
 import dg_microsoft
 from dg_config.settingsfile import get_settings
 from dg_date import daterange
-from dg_microsoft import microsoft_ads_report_builder
-
-
+from dg_microsoft import microsoft_ads_report_builder, report_types
 
 settings = get_settings()
+
 
 def main(quarter):
     """ Main method that calls all the worker modules """
     print('Tracker Running...')
     print(f"Running for {quarter} quarter")
 
-
-    # ToDo: Truncate and handle database stuff.
+    # ToDo: Truncate and handle database stuff with SQLAlchemy
 
     # Set date range.
     if quarter == "this":
@@ -39,7 +37,7 @@ def main(quarter):
         bing_date_range_start = daterange.bing_thisq_start()
         bing_date_range_end = daterange.bing_thisq_end()
         print("Google Date Range is: ", google_date_range)
-        print("Bing Date Range is: ", bing_date_range_start , bing_date_range_end)
+        print("Bing Date Range is: ", bing_date_range_start, bing_date_range_end)
     elif quarter == "last":
         google_date_range = daterange.google_lastq()
         bing_date_range_start = daterange.bing_lastq_start()
@@ -51,7 +49,8 @@ def main(quarter):
 
     # Get Microsoft Ads reports
     # ToDo: Implement using direct call to date range function (move into if statement)
-    microsoft_ads_report_builder.get_report(bing_date_range_start, bing_date_range_end)
+
+    microsoft_ads_report_builder.get_report(bing_date_range_start, bing_date_range_end, report_type="account")
 
 
 if __name__ == "__main__":

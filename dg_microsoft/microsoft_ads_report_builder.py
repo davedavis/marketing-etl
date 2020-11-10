@@ -9,6 +9,7 @@ from dg_microsoft.base_reports.campaignmanagement_example_helper import output_s
 from dg_microsoft.base_reports.output_helper import output_webfault_errors
 from dg_db import storage
 from dg_config import settingsfile
+from dg_microsoft.report_types import get_report_type
 from dg_utils.clean_country import clean_country_name
 from dg_utils.get_quarter_week import get_week_in_quarter
 from dg_utils.print_debug_headers import print_bing_qtd_accounts_headers
@@ -24,10 +25,6 @@ authorization_data = AuthorizationData(account_id=None, customer_id=None, develo
 reporting_service_manager = ReportingServiceManager(authorization_data=authorization_data,
                                                     poll_interval_in_milliseconds=5000, environment=ENVIRONMENT, )
 
-# In addition to ReportingServiceManager, you will need a reporting ServiceClient to build the ReportRequest.
-reporting_service = ServiceClient(service='ReportingService', version=13, authorization_data=authorization_data,
-                                  environment=ENVIRONMENT, )
-
 REPORT_FILE_FORMAT = settings['microsoft_report_format']
 
 # Get list of Microsoft Advertising/Bing Advertising Accounts from the settings file.
@@ -35,60 +32,13 @@ microsoft_accounts = settings['microsoft_accounts']
 
 
 # Set the download parameters and call the download_report method.
-def build_microsoft_report_object(auth_data, start_date, end_date):
+def build_microsoft_report_object(start_date, end_date, report_type):
     """  Kick off the process of building the report object """
-    print("Building report parameters...")
     try:
+        # Call, and get back a complete report request.
+        report_request = get_report_type(report_type, start_date, end_date)
 
-        # Create a ReportTime object and add the date as int values (currently receiving from main)
-        report_time = reporting_service.factory.create('ReportTime')
-        report_time.CustomDateRangeEnd.Day = end_date.day
-        report_time.CustomDateRangeEnd.Month = end_date.month
-        report_time.CustomDateRangeEnd.Year = end_date.year
-        report_time.CustomDateRangeStart.Day = start_date.day
-        report_time.CustomDateRangeStart.Month = start_date.month
-        report_time.CustomDateRangeStart.Year = start_date.year
-        report_time.ReportTimeZone = settings['microsoft_report_timezone']
-
-        report_request = reporting_service.factory.create('AccountPerformanceReportRequest')
-        report_request.Aggregation = settings['microsoft_report_aggregation']
-        report_request.ExcludeColumnHeaders = settings['microsoft_report_exclude_column_headers']
-        report_request.ExcludeReportFooter = settings['microsoft_report_exclude_report_footer']
-        report_request.ExcludeReportHeader = settings['microsoft_report_exclude_report_header']
-        report_request.Format = REPORT_FILE_FORMAT
-        report_request.ReturnOnlyCompleteData = settings['microsoft_report_return_only_complete_data']
-        report_request.Time = report_time
-        report_request.ReportName = "My Account Performance Report"
-        scope = reporting_service.factory.create('AccountReportScope')
-        scope.AccountIds = {'long': [microsoft_accounts]}
-        report_request.Scope = scope
-
-
-        #############################################################################################
-        #                               Parameterize                                                #
-        #############################################################################################
-
-        # ToDo: pass in report columns from main
-
-        report_columns = reporting_service.factory.create('ArrayOfAccountPerformanceReportColumn')
-        report_columns.AccountPerformanceReportColumn.append([
-            'TimePeriod',
-            'AccountNumber',
-            'AccountName',
-            'Impressions',
-            'Clicks',
-            'Spend'
-        ])
-        report_request.Columns = report_columns
-
-        # reporting_service_factory_object
-        # report_column
-
-        #############################################################################################
-        #                               Parameterize                                                #
-        #############################################################################################
-
-        complete_report_object = ReportingDownloadParameters(
+        report_download_request = ReportingDownloadParameters(
             report_request=report_request,
             result_file_directory=settings['microsoft_file_directory'],
             result_file_name='result.' + REPORT_FILE_FORMAT.lower(),
@@ -98,7 +48,7 @@ def build_microsoft_report_object(auth_data, start_date, end_date):
 
         # Download the report in memory with ReportingServiceManager.download_report
         # The download_report helper function downloads the report and summarizes results.
-        download_report(complete_report_object)
+        download_report(report_download_request)
 
     except WebFault as ex:
         output_webfault_errors(ex)
@@ -107,7 +57,7 @@ def build_microsoft_report_object(auth_data, start_date, end_date):
 
 
 # Downloads the report and gets an iterable report object.
-def download_report(reporting_params):
+def download_report(report_download_request):
     """ The download_report method returns both a file that will be downloaded and a report object. The report object
         can be gotten with the reporting_service_manager.download_report(reporting_download_parameters) method. Here,
         we're assigning it to a report_container variable and accessing the data from that."""
@@ -117,7 +67,7 @@ def download_report(reporting_params):
     # ToDo: Keep an eye on this and remove it completely.
     # global reporting_service_manager
 
-    report_container = reporting_service_manager.download_report(reporting_params)
+    report_container = reporting_service_manager.download_report(report_download_request)
 
     if report_container is None:
         output_status_message("There is no report data for the submitted report request parameters.")
@@ -172,8 +122,6 @@ def download_report(reporting_params):
 
 
 # Main
-def get_report(start_date, end_date):
-    start_date = start_date
-    end_date = end_date
+def get_report(start_date, end_date, report_type):
     authenticate(authorization_data)
-    build_microsoft_report_object(authorization_data, start_date, end_date)
+    build_microsoft_report_object(start_date, end_date, report_type)
