@@ -27,7 +27,7 @@ def get_report_type(report_type, start_date, end_date):
         report = get_campaign_report_type()
 
     elif report_type == 'ads':
-        report = get_ads_report_type()
+        report = get_search_ads_report_type(start_date, end_date)
 
     else:
         report = None
@@ -86,15 +86,54 @@ def get_campaign_report_type():
     return report_columns
 
 
-def get_ads_report_type():
-    report_columns = reporting_service.factory.create('ArrayOfAccountPerformanceReportColumn')
-    report_columns.AccountPerformanceReportColumn.append([
+def get_search_ads_report_type(start_date, end_date):
+    report_time = reporting_service.factory.create('ReportTime')
+    report_time.CustomDateRangeEnd.Day = end_date.day
+    report_time.CustomDateRangeEnd.Month = end_date.month
+    report_time.CustomDateRangeEnd.Year = end_date.year
+    report_time.CustomDateRangeStart.Day = start_date.day
+    report_time.CustomDateRangeStart.Month = start_date.month
+    report_time.CustomDateRangeStart.Year = start_date.year
+    report_time.ReportTimeZone = settings['microsoft_report_timezone']
+
+    report_request = reporting_service.factory.create('AdPerformanceReportRequest')
+    report_request.Aggregation = settings['microsoft_report_aggregation']
+    report_request.ExcludeColumnHeaders = settings['microsoft_report_exclude_column_headers']
+    report_request.ExcludeReportFooter = settings['microsoft_report_exclude_report_footer']
+    report_request.ExcludeReportHeader = settings['microsoft_report_exclude_report_header']
+    report_request.Format = REPORT_FILE_FORMAT
+    report_request.ReturnOnlyCompleteData = settings['microsoft_report_return_only_complete_data']
+    report_request.Time = report_time
+    report_request.ReportName = "My Ad Performance Report"
+    scope = reporting_service.factory.create('AccountThroughAdGroupReportScope')
+    scope.AccountIds = {'long': [microsoft_accounts]}
+    report_request.Scope = scope
+
+    report_columns = reporting_service.factory.create('ArrayOfAdPerformanceReportColumn')
+    report_columns.AdPerformanceReportColumn.append([
         'TimePeriod',
-        'AccountNumber',
         'AccountName',
+        'CampaignName',
+        'AdGroupName',
+        'CurrencyCode',
+        'AdDistribution',
         'Impressions',
         'Clicks',
-        'Spend'
+        'Ctr',
+        'AverageCpc',
+        'Spend',
+        'AdGroupId',
+        'AdTitle',
+        'AdDescription',
+        'AdDescription2',
+        'AdType',
+        'TitlePart1',
+        'TitlePart2',
+        'TitlePart3',
+        'Path1',
+        'Path2'
     ])
 
-    return report_columns
+    report_request.Columns = report_columns
+
+    return report_request

@@ -78,9 +78,7 @@ def download_report(report_download_request):
     # Create a list to contain tuples from the response that we'll add to the database.
     records_to_insert = []
 
-    # Print the headers for debugging in the console.
-    print_bing_qtd_accounts_headers()
-
+    # Loop through the returned records and do something with them.
     for record in report_record_iterable:
         # Convert the date string into a datetime object, then convert it to the correct format in report spec.
         date_time_obj = datetime.strptime(record.value('TimePeriod'), '%Y-%m-%d')
@@ -92,27 +90,29 @@ def download_report(report_download_request):
 
         week_number = get_week_in_quarter(datetime.strptime(record.value('TimePeriod'), '%Y-%m-%d'))
 
-        # Print to the console for debugging.
-        print(report_formatted_date,
-              record.value('AccountNumber'),
-              report_formatted_account_country,
-              record.value('Impressions'),
-              record.value('Clicks'),
-              record.value('Spend'),
-              week_number,
-              sep='\t')
+        print(report_formatted_date, report_formatted_account_country, record.value('Spend'), week_number)
 
-        # Convert each row to a tuple to be added to the DB.
-        single_record_for_insertion = (record.value('TimePeriod'),
-                                       record.value('AccountNumber'),
-                                       report_formatted_account_country,
-                                       record.value('Impressions'),
-                                       record.value('Clicks'),
-                                       record.value('Spend'),
-                                       week_number)
+        # # Print to the console for debugging.
+        # print(report_formatted_date,
+        #       record.value('AccountNumber'),
+        #       report_formatted_account_country,
+        #       record.value('Impressions'),
+        #       record.value('Clicks'),
+        #       record.value('Spend'),
+        #       week_number,
+        #       sep='\t')
+        #
+        # # Convert each row to a tuple to be added to the DB.
+        # single_record_for_insertion = (record.value('TimePeriod'),
+        #                                record.value('AccountNumber'),
+        #                                report_formatted_account_country,
+        #                                record.value('Impressions'),
+        #                                record.value('Clicks'),
+        #                                record.value('Spend'),
+        #                                week_number)
 
         # Add the tuple to the list
-        records_to_insert.append(single_record_for_insertion)
+        # records_to_insert.append(single_record_for_insertion)
 
     # Write to DB using the DB module.
     write_microsoft_campaign_report(records_to_insert)
