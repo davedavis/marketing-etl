@@ -8,6 +8,7 @@ Currently, it supports spend, revenue, ROAS/E:R, Conversion Rate and CTR.
 
 # DB refactor
 - [ ] Refactor DB to use SQLAlchemy for DB portability.
+- [ ] Use SQLAlchemy functions to replace queries.
 
 # Microsoft Refactor
 - [x] Refactor auth
