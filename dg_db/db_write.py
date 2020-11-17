@@ -13,13 +13,14 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 from datetime import datetime
-
+import pandas as pd
 
 # Links :
 # https://stackoverflow.com/questions/2877410/python-store-a-dict-in-a-database
 #
 
 import mysql
+from pandas import DataFrame
 
 from dg_config import settingsfile
 from dg_db import storage
@@ -80,9 +81,6 @@ def write_microsoft_accounts_report(report_results):
         # Add the tuple to the list
         records_to_insert.append(single_record_for_insertion)
 
-    for single_record in records_to_insert:
-        print("test", single_record)
-
     try:
 
         my_sql_insert_query = """INSERT INTO Bing_QTD_Account_Report (TimePeriod, AccountNumber, AccountName, Impressions, Clicks, Spend, Week)
@@ -104,42 +102,8 @@ def write_microsoft_accounts_report(report_results):
 
 
 def write_microsoft_campaigns_report(report_results):
-    try:
-
-        my_sql_insert_query = """INSERT INTO Bing_QTD_Account_Report (TimePeriod, AccountNumber, AccountName, Impressions, Clicks, Spend, Week)
-                                 VALUES (%s, %s, %s, %s, %s, %s, %s) """
-
-        cursor = connection.cursor()
-        cursor.executemany(my_sql_insert_query, report_results)
-        connection.commit()
-        print(cursor.rowcount, "Record inserted successfully into Bing_QTD_Account_Report table")
-
-    except mysql.connector.Error as error:
-        print("Failed to insert record into MySQL table {}".format(error))
-
-    finally:
-        if connection.is_connected():
-            cursor.close()
-            connection.close()
-            print("MySQL connection is closed")
+    pass
 
 
 def write_microsoft_ads_report(report_results):
-    try:
-
-        my_sql_insert_query = """INSERT INTO Bing_QTD_Account_Report (TimePeriod, AccountNumber, AccountName, Impressions, Clicks, Spend, Week)
-                                 VALUES (%s, %s, %s, %s, %s, %s, %s) """
-
-        cursor = connection.cursor()
-        cursor.executemany(my_sql_insert_query, report_results)
-        connection.commit()
-        print(cursor.rowcount, "Record inserted successfully into Bing_QTD_Account_Report table")
-
-    except mysql.connector.Error as error:
-        print("Failed to insert record into MySQL table {}".format(error))
-
-    finally:
-        if connection.is_connected():
-            cursor.close()
-            connection.close()
-            print("MySQL connection is closed")
+    pass

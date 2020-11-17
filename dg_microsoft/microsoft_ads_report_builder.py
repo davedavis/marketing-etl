@@ -76,9 +76,7 @@ def build_microsoft_report_object(start_date, end_date, report_type):
         # Return the report for
         return report_record_iterable
 
-        # Close the container
-        report_container.close()
-
+        # ToDo: Close the container
 
 
     except WebFault as ex:
