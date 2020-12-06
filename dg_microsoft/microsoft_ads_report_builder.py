@@ -63,7 +63,7 @@ def build_microsoft_report_object(start_date, end_date, report_type):
 
         # Download the report in memory with ReportingServiceManager.download_report
         # The download_report helper function downloads the report and summarizes results.
-        print("Downloading the Microsoft Ads report...")
+        print(f"Downloading the Microsoft Ads {report_type} report...")
 
         report_container = reporting_service_manager.download_report(report_download_request)
 
@@ -77,7 +77,6 @@ def build_microsoft_report_object(start_date, end_date, report_type):
         return report_record_iterable
 
         # ToDo: Close the container
-
 
     except WebFault as ex:
         output_webfault_errors(ex)

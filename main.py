@@ -19,6 +19,7 @@ import argparse
 import dg_microsoft
 from dg_config.settingsfile import get_settings
 from dg_date import daterange
+from dg_db.db_utils import init_db
 from dg_microsoft import microsoft_ads_report_builder, report_types
 
 settings = get_settings()
@@ -50,7 +51,11 @@ def main(quarter):
     # Get Microsoft Ads reports
     # ToDo: Implement using direct call to date range function (move into if statement)
 
+    init_db()
+
     microsoft_ads_report_builder.get_report(bing_date_range_start, bing_date_range_end, report_type="accounts")
+    microsoft_ads_report_builder.get_report(bing_date_range_start, bing_date_range_end, report_type="campaigns")
+    microsoft_ads_report_builder.get_report(bing_date_range_start, bing_date_range_end, report_type="ads")
 
 
 if __name__ == "__main__":

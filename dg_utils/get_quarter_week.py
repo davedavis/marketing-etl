@@ -7,7 +7,8 @@ LAST_MONDAY = relativedelta.relativedelta(weekday=relativedelta.MO(-1))
 ONE_WEEK = timedelta(weeks=1)
 
 
-def get_week_in_quarter(dt: datetime) -> typing.Tuple[int, int, int]:
+# def get_week_in_quarter(dt: datetime) -> typing.Tuple[int, int, int]:
+def get_week_in_quarter(dt):
     d: date = dt.date()
     year = d.year
 

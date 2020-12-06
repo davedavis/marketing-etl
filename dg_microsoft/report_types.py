@@ -101,6 +101,7 @@ def get_campaign_report_type(start_date, end_date):
     report_columns.CampaignPerformanceReportColumn.append([
         'AccountName',
         'TimePeriod',
+        'AccountNumber',
         'CampaignId',
         'CampaignName',
         'DeviceType',
@@ -141,7 +142,9 @@ def get_search_ads_report_type(start_date, end_date):
     report_columns.AdPerformanceReportColumn.append([
         'TimePeriod',
         'AccountName',
+        'AccountNumber',
         'CampaignName',
+        'CampaignId',
         'AdGroupName',
         'CurrencyCode',
         'AdDistribution',
