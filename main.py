@@ -16,11 +16,11 @@
 """ App that tracks the spend, revenue, E/R, Conversion Rate, CTR and percentage attainment in paid search by country
     and campaign type and generates"""
 import argparse
-import dg_microsoft
 from dg_config.settingsfile import get_settings
 from dg_date import daterange
 from dg_db.db_utils import init_db
-from dg_microsoft import microsoft_ads_report_builder, report_types
+from dg_google import google_ads_report_builder
+from dg_microsoft import microsoft_ads_report_builder
 
 settings = get_settings()
 
@@ -30,7 +30,8 @@ def main(quarter):
     print('Tracker Running...')
     print(f"Running for {quarter} quarter")
 
-    # ToDo: Truncate and handle database stuff with SQLAlchemy
+    # Truncate and setup database tables with SQLAlchemy
+    init_db()
 
     # Set date range.
     if quarter == "this":
@@ -48,10 +49,11 @@ def main(quarter):
     else:
         print("Sorry, reporting further back from last quarter is not supported yet, contact Dave if you need this.")
 
+    # Get Google Ads reports
+    google_ads_report_builder.get_report(google_date_range, report_type="accounts")
+
     # Get Microsoft Ads reports
     # ToDo: Implement using direct call to date range function (move into if statement)
-
-    init_db()
 
     microsoft_ads_report_builder.get_report(bing_date_range_start, bing_date_range_end, report_type="accounts")
     microsoft_ads_report_builder.get_report(bing_date_range_start, bing_date_range_end, report_type="campaigns")
@@ -64,7 +66,7 @@ if __name__ == "__main__":
     parser.add_argument("-q", "--quarter",
                         type=str,
                         default="this",
-                        help="The quarter you want the report for (this is default or last for backfill)")
+                        help="The quarter you want the report for ('this' is default or 'last' for backfill)")
     args = parser.parse_args()
 
     main(args.quarter)
