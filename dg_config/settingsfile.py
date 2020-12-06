@@ -25,7 +25,7 @@ def get_settings():
             settings_file = yaml.load(f, Loader=yaml.SafeLoader)
             selected_settings = dict(settings_file)
     else:
-        with open('dg_config/settings.dev.yaml', 'r') as f:
+        with open('dg_config/settings.yaml', 'r') as f:
             settings_file = yaml.load(f, Loader=yaml.SafeLoader)
             selected_settings = dict(settings_file)
 
@@ -36,6 +36,6 @@ def get_settings_file_path():
     if os.environ['DG_ENV']:
         settings_file_path_string = 'dg_config/settings.dev.yaml'
     else:
-        settings_file_path_string = 'dg_config/settings.dev.yaml'
+        settings_file_path_string = 'dg_config/settings.yaml'
 
     return settings_file_path_string

@@ -56,8 +56,8 @@ def main(quarter):
     # ToDo: Implement using direct call to date range function (move into if statement)
 
     microsoft_ads_report_builder.get_report(bing_date_range_start, bing_date_range_end, report_type="accounts")
-    microsoft_ads_report_builder.get_report(bing_date_range_start, bing_date_range_end, report_type="campaigns")
-    microsoft_ads_report_builder.get_report(bing_date_range_start, bing_date_range_end, report_type="ads")
+    # microsoft_ads_report_builder.get_report(bing_date_range_start, bing_date_range_end, report_type="campaigns")
+    # microsoft_ads_report_builder.get_report(bing_date_range_start, bing_date_range_end, report_type="ads")
 
 
 if __name__ == "__main__":
