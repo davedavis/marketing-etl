@@ -1,0 +1,5 @@
+- [ ] Create Google Reports
+- [ ] Normalize models
+- [ ] Create DB views for POEs and required reports
+- [ ] Match Adobe revenue by day for account reports (update account report model)
+- [ ] Create spinner/progress bar for report and DB writes.
