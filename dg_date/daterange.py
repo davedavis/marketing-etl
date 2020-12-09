@@ -21,7 +21,7 @@ current_quarter = fiscalyear.FiscalQuarter.current()
 last_quarter = fiscalyear.FiscalQuarter.prev_quarter
 
 # Last Quarter Settings
-# ToDo: Calculate hard coded Q2 in last quarter and remove lnv.
+# ToDo: Calculate hard coded Q2 in last quarter
 company_fiscal_year = fiscalyear.FiscalYear(2021)
 last_quarter_start_date = company_fiscal_year.q2.start.strftime('%Y-%m-%d')
 last_quarter_end_date = company_fiscal_year.q2.end.strftime('%Y-%m-%d')

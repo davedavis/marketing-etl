@@ -76,22 +76,18 @@ def write_microsoft_report_to_db(report_results, report_type):
 
 def write_google_accounts_report(report_results):
     # For timing the DB writes. Compare at the end of the method.
-    t0 = time.time()
+    tga = time.time()
 
     # Create a list to contain tuples from the response that we'll add to the database.
     accounts_report_records_to_insert = []
 
     # Loop through the returned records and do something with them.
     for record in report_results:
-        report_formatted_account_country = clean_country_name(record.customer.descriptive_name)
-        week_number = get_week_in_quarter(datetime.strptime(record.segments.date, "%Y-%m-%d"))
-        account_number = record.customer.resource_name.split("/")[1]
-
         report_record = AccountReportRecord(platform="Google",
-                                            account_name=report_formatted_account_country,
-                                            account_number=account_number,
+                                            account_name=clean_country_name(record.customer.descriptive_name),
+                                            account_number=record.customer.resource_name.split("/")[1],
                                             time_period=record.segments.date,
-                                            week=week_number,
+                                            week=get_week_in_quarter(datetime.strptime(record.segments.date, "%Y-%m-%d")),
                                             impressions=record.metrics.impressions,
                                             clicks=record.metrics.clicks,
                                             spend=record.metrics.cost_micros / 1000000)
@@ -108,31 +104,26 @@ def write_google_accounts_report(report_results):
     # Close the session
     session.close()
 
-    print("Total time for adding Google accounts to the database was " + str(time.time() - t0) + " secs ")
+    print("Total time for adding Google accounts to the database was " + str(time.time() - tga)[:-15] + " secs ")
 
 
 def write_google_campaigns_report(report_results):
-    t0 = time.time()
+    tgc = time.time()
     campaigns_report_records_to_insert = []
 
     for record in report_results:
-        report_formatted_account_country = clean_country_name(record.customer.descriptive_name)
-        week_number = get_week_in_quarter(datetime.strptime(record.segments.date, "%Y-%m-%d"))
-        account_number = record.customer.resource_name.split("/")[1]
-
         # Get the channel ENUM from the client so we can see the specific network the ad was run on.
         # Search, Shopping, Display, Display Select etc.
         channel = GoogleAdsClient.get_type('AdvertisingChannelTypeEnum')
-        network = channel.AdvertisingChannelType.Name(record.campaign.advertising_channel_type).title()
 
         report_record = CampaignReportRecord(platform="Google",
-                                             account_name=report_formatted_account_country,
-                                             account_number=account_number,
+                                             account_name=clean_country_name(record.customer.descriptive_name),
+                                             account_number=record.customer.resource_name.split("/")[1],
                                              time_period=record.segments.date,
-                                             week=week_number,
+                                             week=get_week_in_quarter(datetime.strptime(record.segments.date, "%Y-%m-%d")),
                                              campaign=record.campaign.name,
                                              campaign_id=record.campaign.id,
-                                             network=network,
+                                             network=channel.AdvertisingChannelType.Name(record.campaign.advertising_channel_type).title(),
                                              impressions=record.metrics.impressions,
                                              clicks=record.metrics.clicks,
                                              spend=record.metrics.cost_micros / 1000000)
@@ -149,11 +140,11 @@ def write_google_campaigns_report(report_results):
     # Close the session
     session.close()
 
-    print("Total time for adding Google campaigns to the database was " + str(time.time() - t0) + " secs ")
+    print("Total time for adding Google campaigns to the database was " + str(time.time() - tgc)[:-15] + " secs ")
 
 
 def write_google_search_ads_report(report_results):
-    t0 = time.time()
+    tgsa = time.time()
     ads_report_records_to_insert = []
 
     for record in report_results:
@@ -175,32 +166,24 @@ def write_google_search_ads_report(report_results):
             for description_pos, rsa_description in enumerate(record.ad_group_ad.ad.responsive_search_ad.descriptions):
                 rsa_description_list[description_pos] = rsa_description.text
 
-        # Some formatting for the DB and some additional field calculations.
-        report_formatted_account_country = clean_country_name(record.customer.descriptive_name)
-        week_number = get_week_in_quarter(datetime.strptime(record.segments.date, "%Y-%m-%d"))
-        account_number = record.customer.resource_name.split("/")[1]
-        report_formatted_ctr = record.metrics.ctr * 100
-        report_formatted_average_cpc = record.metrics.average_cpc / 1000000
-
         # Get the channel ENUM from the client so we can see the specific network the ad was run on.
         # Search, Shopping, Display, Display Select etc.
         channel = GoogleAdsClient.get_type('AdvertisingChannelTypeEnum')
 
         # Build the record for insertion.
         report_record = AdReportRecord(platform='Google',
-                                       account_name=report_formatted_account_country,
-                                       account_number=account_number,
+                                       account_name=clean_country_name(record.customer.descriptive_name),
+                                       account_number=record.customer.resource_name.split("/")[1],
                                        time_period=record.segments.date,
-                                       week=week_number,
+                                       week=get_week_in_quarter(datetime.strptime(record.segments.date, "%Y-%m-%d")),
                                        campaign=record.campaign.name,
                                        currency=record.customer.currency_code,
                                        impressions=record.metrics.impressions,
                                        clicks=record.metrics.clicks,
                                        spend=record.metrics.cost_micros / 1000000,
-                                       ctr=report_formatted_ctr,
-                                       average_cpc=report_formatted_average_cpc,
-                                       ad_type=channel.AdvertisingChannelType.Name(
-                                           record.campaign.advertising_channel_type).title(),
+                                       ctr=record.metrics.ctr * 100,
+                                       average_cpc=record.metrics.average_cpc / 1000000,
+                                       ad_type=channel.AdvertisingChannelType.Name(record.campaign.advertising_channel_type).title(),
                                        path_1=record.ad_group_ad.ad.expanded_text_ad.path1,
                                        path_2=record.ad_group_ad.ad.expanded_text_ad.path2,
                                        headline_1=record.ad_group_ad.ad.expanded_text_ad.headline_part1,
@@ -240,21 +223,14 @@ def write_google_search_ads_report(report_results):
     # Close the session
     session.close()
 
-    print("Total time for adding Google search ads to the database was " + str(time.time() - t0) + " secs ")
+    print("Total time for adding Google search ads to the database was " + str(time.time() - tgsa)[:-15] + " secs ")
 
 
 def write_google_shopping_ads_report(report_results):
-    t0 = time.time()
+    tgshop = time.time()
     shopping_ads_report_records_to_insert = []
 
     for record in report_results:
-        # ToDo: Clean up report formatted values. Add directly into parameters.
-        # report_formatted_account_country = clean_country_name(record.customer.descriptive_name)
-        # week_number = get_week_in_quarter(datetime.strptime(record.segments.date, "%Y-%m-%d"))
-        account_number = record.customer.resource_name.split("/")[1]
-        report_formatted_ctr = record.metrics.ctr * 100
-        report_formatted_average_cpc = record.metrics.average_cpc / 1000000
-
         # Get the channel ENUM from the client so we can see the specific network the ad was run on.
         # Search, Shopping, Display, Display Select etc.
         channel = GoogleAdsClient.get_type('AdvertisingChannelTypeEnum')
@@ -288,29 +264,22 @@ def write_google_shopping_ads_report(report_results):
     # Close the session
     session.close()
 
-    print("Total time for adding Google shopping ads to the database was " + str(time.time() - t0) + " secs ")
+    print("Total time for adding Google shopping ads to the database was " + str(time.time() - tgshop)[:-15] + " secs ")
 
 
 def write_microsoft_accounts_report(report_results):
-    t0 = time.time()
+    tma = time.time()
 
     # Create a list to contain tuples from the response that we'll add to the database.
     accounts_report_records_to_insert = []
 
     # Loop through the returned records and do something with them.
     for record in report_results:
-        # Account Names contain the country, but are inconsistent. This is a simple function that
-        # takes the account name and returns a clean country name. ToDo: Move this into Model.
-        report_formatted_account_country = clean_country_name(record.value('AccountName'))
-
-        # Set the week number based off the time period field.
-        week_number = get_week_in_quarter(datetime.strptime(record.value('TimePeriod'), '%Y-%m-%d'))
-
         report_record = AccountReportRecord(platform='Microsoft',
-                                            account_name=report_formatted_account_country,
+                                            account_name=clean_country_name(record.value('AccountName')),
                                             account_number=record.value('AccountNumber'),
                                             time_period=record.value('TimePeriod'),
-                                            week=week_number,
+                                            week=get_week_in_quarter(datetime.strptime(record.value('TimePeriod'), '%Y-%m-%d')),
                                             impressions=record.value('Impressions'),
                                             clicks=record.value('Clicks'),
                                             spend=record.value('Spend'))
@@ -327,24 +296,20 @@ def write_microsoft_accounts_report(report_results):
     # Close the session
     session.close()
 
-    print("Total time for adding Microsoft accounts to the database was " + str(time.time() - t0) + " secs ")
+    print("Total time for adding Microsoft accounts to the database was " + str(time.time() - tma)[:-15] + " secs ")
 
 
 def write_microsoft_campaigns_report(report_results):
-    t0 = time.time()
+    tmc = time.time()
 
     campaigns_report_records_to_insert = []
 
     for record in report_results:
-        report_formatted_account_country = clean_country_name(record.value('AccountName'))
-
-        week_number = get_week_in_quarter(datetime.strptime(record.value('TimePeriod'), '%Y-%m-%d'))
-
         report_record = CampaignReportRecord(platform='Microsoft',
-                                             account_name=report_formatted_account_country,
+                                             account_name=clean_country_name(record.value('AccountName')),
                                              account_number=record.value('AccountNumber'),
                                              time_period=record.value('TimePeriod'),
-                                             week=week_number,
+                                             week=get_week_in_quarter(datetime.strptime(record.value('TimePeriod'), '%Y-%m-%d')),
                                              campaign=record.value('CampaignName'),
                                              campaign_id=record.value('CampaignId'),
                                              network=record.value('Network'),
@@ -360,17 +325,15 @@ def write_microsoft_campaigns_report(report_results):
     # Close the session
     session.close()
 
-    print("Total time for adding Microsoft campaigns to the database was " + str(time.time() - t0) + " secs ")
+    print("Total time for adding Microsoft campaigns to the database was " + str(time.time() - tmc)[:-15] + " secs ")
 
 
 def write_microsoft_search_ads_report(report_results):
-    t0 = time.time()
+    tmsa = time.time()
 
     ads_report_records_to_insert = []
 
     for record in report_results:
-        report_formatted_account_country = clean_country_name(record.value('AccountName'))
-        week_number = get_week_in_quarter(datetime.strptime(record.value('TimePeriod'), '%Y-%m-%d'))
 
         # Check and make sure an empty string wasn't received. Bing... I want to strangle you!
         if record.value('Ctr'):
@@ -379,10 +342,10 @@ def write_microsoft_search_ads_report(report_results):
             report_formatted_ctr = 0.0
 
         report_record = AdReportRecord(platform='Microsoft',
-                                       account_name=report_formatted_account_country,
+                                       account_name=clean_country_name(record.value('AccountName')),
                                        account_number=record.value('AccountNumber'),
                                        time_period=record.value('TimePeriod'),
-                                       week=week_number,
+                                       week=get_week_in_quarter(datetime.strptime(record.value('TimePeriod'), '%Y-%m-%d')),
                                        campaign=record.value('CampaignName'),
                                        currency='USD',
                                        impressions=record.value('Impressions'),
@@ -408,11 +371,11 @@ def write_microsoft_search_ads_report(report_results):
     # Close the session
     session.close()
 
-    print("Total time for adding Microsoft ads to the database was " + str(time.time() - t0) + " secs ")
+    print("Total time for adding Microsoft ads to the database was " + str(time.time() - tmsa)[:-15] + " secs ")
 
 
 def write_microsoft_shopping_ads_report(report_results):
-    t0 = time.time()
+    tmshop = time.time()
 
     ads_report_records_to_insert = []
 
@@ -446,4 +409,4 @@ def write_microsoft_shopping_ads_report(report_results):
     session.commit()
     session.close()
 
-    print("Total time for adding Microsoft shopping ads to the database was " + str(time.time() - t0) + " secs ")
+    print("Total time for adding Microsoft shopping ads to the database was " + str(time.time() - tmshop)[:-15] + " secs ")
