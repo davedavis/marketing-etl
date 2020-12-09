@@ -37,6 +37,8 @@ settings = settingsfile.get_settings()
 
 
 def write_google_report_to_db(report_results, report_type):
+    print(f"Google {report_type} report received, writing to DB...")
+
     if report_type == 'accounts':
         write_google_accounts_report(report_results)
 
@@ -54,6 +56,8 @@ def write_google_report_to_db(report_results, report_type):
 
 
 def write_microsoft_report_to_db(report_results, report_type):
+    print(f"Microsoft {report_type} report received, writing to DB...")
+
     if report_type == 'accounts':
         write_microsoft_accounts_report(report_results)
 
@@ -61,10 +65,13 @@ def write_microsoft_report_to_db(report_results, report_type):
         write_microsoft_campaigns_report(report_results)
 
     elif report_type == 'ads':
-        write_microsoft_ads_report(report_results)
+        write_microsoft_search_ads_report(report_results)
+
+    elif report_type == 'shopping':
+        write_microsoft_shopping_ads_report(report_results)
 
     else:
-        print("You need to provide a Microsoft Ads report type like 'accounts', 'campaigns' or 'ads'.")
+        print("You need to provide a Microsoft Ads report type like 'accounts', 'campaigns', 'ads' or 'shopping'.")
 
 
 def write_google_accounts_report(report_results):
@@ -75,7 +82,7 @@ def write_google_accounts_report(report_results):
     accounts_report_records_to_insert = []
 
     # Loop through the returned records and do something with them.
-    for record in tqdm(report_results):
+    for record in report_results:
         report_formatted_account_country = clean_country_name(record.customer.descriptive_name)
         week_number = get_week_in_quarter(datetime.strptime(record.segments.date, "%Y-%m-%d"))
         account_number = record.customer.resource_name.split("/")[1]
@@ -101,18 +108,14 @@ def write_google_accounts_report(report_results):
     # Close the session
     session.close()
 
-    print("Total time for adding Google Ads accounts to the database was " + str(time.time() - t0) + " secs ")
-    # Clear the progress bar.
-    list(getattr(tqdm, '_instances'))
-    for instance in list(tqdm._instances):
-        tqdm._decr_instances(instance)
+    print("Total time for adding Google accounts to the database was " + str(time.time() - t0) + " secs ")
 
 
 def write_google_campaigns_report(report_results):
     t0 = time.time()
     campaigns_report_records_to_insert = []
 
-    for record in tqdm(report_results):
+    for record in report_results:
         report_formatted_account_country = clean_country_name(record.customer.descriptive_name)
         week_number = get_week_in_quarter(datetime.strptime(record.segments.date, "%Y-%m-%d"))
         account_number = record.customer.resource_name.split("/")[1]
@@ -146,18 +149,14 @@ def write_google_campaigns_report(report_results):
     # Close the session
     session.close()
 
-    print("Total time for adding Google Ads campaigns to the database was " + str(time.time() - t0) + " secs ")
-    # Clear the progress bar.
-    list(getattr(tqdm, '_instances'))
-    for instance in list(tqdm._instances):
-        tqdm._decr_instances(instance)
+    print("Total time for adding Google campaigns to the database was " + str(time.time() - t0) + " secs ")
 
 
 def write_google_search_ads_report(report_results):
     t0 = time.time()
     ads_report_records_to_insert = []
 
-    for record in tqdm(report_results):
+    for record in report_results:
         # print(record)
 
         # Handle RSA ad types first as SQLAlchemy needs to insert uniform objects..
@@ -241,19 +240,15 @@ def write_google_search_ads_report(report_results):
     # Close the session
     session.close()
 
-    print("Total time for adding Google Ads search ads to the database was " + str(time.time() - t0) + " secs ")
-    # Clear the progress bar.
-    list(getattr(tqdm, '_instances'))
-    for instance in list(tqdm._instances):
-        tqdm._decr_instances(instance)
+    print("Total time for adding Google search ads to the database was " + str(time.time() - t0) + " secs ")
 
 
 def write_google_shopping_ads_report(report_results):
     t0 = time.time()
-    print("Google Shopping Ads report received, writing to DB")
     shopping_ads_report_records_to_insert = []
 
-    for record in tqdm(report_results):
+    for record in report_results:
+        # ToDo: Clean up report formatted values. Add directly into parameters.
         # report_formatted_account_country = clean_country_name(record.customer.descriptive_name)
         # week_number = get_week_in_quarter(datetime.strptime(record.segments.date, "%Y-%m-%d"))
         account_number = record.customer.resource_name.split("/")[1]
@@ -293,22 +288,17 @@ def write_google_shopping_ads_report(report_results):
     # Close the session
     session.close()
 
-    print("Total time for adding Google Ads shopping ads to the database was " + str(time.time() - t0) + " secs ")
-    # Clear the progress bar.
-    list(getattr(tqdm, '_instances'))
-    for instance in list(tqdm._instances):
-        tqdm._decr_instances(instance)
+    print("Total time for adding Google shopping ads to the database was " + str(time.time() - t0) + " secs ")
 
 
 def write_microsoft_accounts_report(report_results):
     t0 = time.time()
 
-    print("Microsoft Accounts report received, writing to DB")
     # Create a list to contain tuples from the response that we'll add to the database.
     accounts_report_records_to_insert = []
 
     # Loop through the returned records and do something with them.
-    for record in tqdm(report_results):
+    for record in report_results:
         # Account Names contain the country, but are inconsistent. This is a simple function that
         # takes the account name and returns a clean country name. ToDo: Move this into Model.
         report_formatted_account_country = clean_country_name(record.value('AccountName'))
@@ -337,20 +327,15 @@ def write_microsoft_accounts_report(report_results):
     # Close the session
     session.close()
 
-    print("Total time for adding Microsoft Ads accounts to the database was " + str(time.time() - t0) + " secs ")
-    # Clear the progress bar.
-    list(getattr(tqdm, '_instances'))
-    for instance in list(tqdm._instances):
-        tqdm._decr_instances(instance)
+    print("Total time for adding Microsoft accounts to the database was " + str(time.time() - t0) + " secs ")
 
 
 def write_microsoft_campaigns_report(report_results):
     t0 = time.time()
 
-    print("Microsoft Campaigns report received, writing to DB")
     campaigns_report_records_to_insert = []
 
-    for record in tqdm(report_results):
+    for record in report_results:
         report_formatted_account_country = clean_country_name(record.value('AccountName'))
 
         week_number = get_week_in_quarter(datetime.strptime(record.value('TimePeriod'), '%Y-%m-%d'))
@@ -375,20 +360,15 @@ def write_microsoft_campaigns_report(report_results):
     # Close the session
     session.close()
 
-    print("Total time for adding Microsoft Ads campaigns to the database was " + str(time.time() - t0) + " secs ")
-    # Clear the progress bar.
-    list(getattr(tqdm, '_instances'))
-    for instance in list(tqdm._instances):
-        tqdm._decr_instances(instance)
+    print("Total time for adding Microsoft campaigns to the database was " + str(time.time() - t0) + " secs ")
 
 
-def write_microsoft_ads_report(report_results):
+def write_microsoft_search_ads_report(report_results):
     t0 = time.time()
 
-    print("Microsoft Ads report received, writing to DB")
     ads_report_records_to_insert = []
 
-    for record in tqdm(report_results):
+    for record in report_results:
         report_formatted_account_country = clean_country_name(record.value('AccountName'))
         week_number = get_week_in_quarter(datetime.strptime(record.value('TimePeriod'), '%Y-%m-%d'))
 
@@ -428,8 +408,42 @@ def write_microsoft_ads_report(report_results):
     # Close the session
     session.close()
 
-    print("Total time for adding Microsoft Ads ads to the database was " + str(time.time() - t0) + " secs ")
-    # Clear the progress bar.
-    list(getattr(tqdm, '_instances'))
-    for instance in list(tqdm._instances):
-        tqdm._decr_instances(instance)
+    print("Total time for adding Microsoft ads to the database was " + str(time.time() - t0) + " secs ")
+
+
+def write_microsoft_shopping_ads_report(report_results):
+    t0 = time.time()
+
+    ads_report_records_to_insert = []
+
+    for record in report_results:
+        # Check and make sure an empty string wasn't received. Bing... I want to strangle you!
+        if record.value('Ctr'):
+            report_formatted_ctr = float(record.value('Ctr').strip('%'))
+        else:
+            report_formatted_ctr = 0.0
+
+        report_record = AdReportRecord(platform='Microsoft',
+                                       account_name=clean_country_name(record.value('AccountName')),
+                                       account_number=record.value('AccountNumber'),
+                                       time_period=record.value('TimePeriod'),
+                                       week=get_week_in_quarter(datetime.strptime(record.value('TimePeriod'), '%Y-%m-%d')),
+                                       campaign=record.value('CampaignName'),
+                                       currency=record.value('CurrencyCode'),
+                                       impressions=record.value('Impressions'),
+                                       clicks=record.value('Clicks'),
+                                       spend=record.value('Spend'),
+                                       ctr=report_formatted_ctr,
+                                       average_cpc=record.value('AverageCpc'),
+                                       ad_type='Shopping',
+                                       shopping_title=record.value('Title')
+                                       )
+
+        ads_report_records_to_insert.append(report_record)
+
+    session = get_session()
+    session.bulk_save_objects(ads_report_records_to_insert)
+    session.commit()
+    session.close()
+
+    print("Total time for adding Microsoft shopping ads to the database was " + str(time.time() - t0) + " secs ")

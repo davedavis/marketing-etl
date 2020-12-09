@@ -84,6 +84,7 @@ db_host : localhost
 db_database : {Enter Your Own Value Here}
 db_user : {Enter Your Own Value Here}
 db_password : {Enter Your Own Value Here}
+db_connection_string : mysql+mysqlconnector://user:password@localhost:3306/databasename
 
 
 

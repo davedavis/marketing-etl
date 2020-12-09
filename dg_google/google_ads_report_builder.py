@@ -37,7 +37,7 @@ def get_report(date_range, report_type):
 
     records_to_insert = []
 
-    for account in tqdm(settings['google_accounts'], position=0, leave=True):
+    for account in settings['google_accounts']:
         response = ga_service.search_stream(str(account), query)
 
         # Get the data from the API
@@ -56,7 +56,5 @@ def get_report(date_range, report_type):
                     for field_path_element in error.location.field_path_elements:
                         print(f'\t\tOn the field: {field_path_element.field_name}')
             sys.exit(1)
-
-    print(f"Google {report_type} report received, writing to DB...")
 
     write_google_report_to_db(records_to_insert, report_type)

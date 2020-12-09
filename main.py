@@ -17,6 +17,7 @@
     a database for report generation"""
 import argparse
 import time
+from tqdm import tqdm as tqdm
 
 from dg_config.settingsfile import get_settings
 from dg_date import daterange
@@ -34,13 +35,15 @@ def main(quarter):
 
     # For timing the running of the app.
     t0 = time.time()
-    print('Timer started...')
+    print('App runtime timer started...')
 
     # Truncate and setup database tables with SQLAlchemy
-    init_db()
     print('Truncating database tables...')
+    init_db()
+    print('Tables truncated.')
 
     # Set date range.
+    print('Calculating date range for reports..')
     if quarter == "this":
         google_date_range = daterange.google_thisq()
         bing_date_range_start = daterange.bing_thisq_start()
@@ -56,21 +59,25 @@ def main(quarter):
     else:
         print("Sorry, reporting further back from last quarter is not supported yet, contact Dave if you need this.")
 
-    # Get Google Ads reports
+    # Initialize the report retrieval flow. Stagger platforms & sleep for rate limiting.
     google_ads_report_builder.get_report(google_date_range, report_type="accounts")
-    # google_ads_report_builder.get_report(google_date_range, report_type="campaigns")
-    # google_ads_report_builder.get_report(google_date_range, report_type="ads")
-    # google_ads_report_builder.get_report(google_date_range, report_type="shopping")
+    microsoft_ads_report_builder.get_report(bing_date_range_start, bing_date_range_end, report_type="accounts")
+    time.sleep(10)
 
-    # Get Microsoft Ads reports
-    # ToDo: Implement using direct call to date range function (move into if statement)
-    # microsoft_ads_report_builder.get_report(bing_date_range_start, bing_date_range_end, report_type="accounts")
-    # microsoft_ads_report_builder.get_report(bing_date_range_start, bing_date_range_end, report_type="campaigns")
-    # microsoft_ads_report_builder.get_report(bing_date_range_start, bing_date_range_end, report_type="ads")
+    google_ads_report_builder.get_report(google_date_range, report_type="campaigns")
+    microsoft_ads_report_builder.get_report(bing_date_range_start, bing_date_range_end, report_type="campaigns")
+    time.sleep(10)
+
+    google_ads_report_builder.get_report(google_date_range, report_type="ads")
+    microsoft_ads_report_builder.get_report(bing_date_range_start, bing_date_range_end, report_type="ads")
+    time.sleep(10)
+
+    google_ads_report_builder.get_report(google_date_range, report_type="shopping")
+    microsoft_ads_report_builder.get_report(bing_date_range_start, bing_date_range_end, report_type="shopping")
 
     # End of the app run, calculate the total time it took.
     print("Time to get all the reports and write them all to the database today is "
-          + str(time.time() - t0)[:-16] + " secs. Or " + str((time.time() - t0) / 60)[:-16] + " minutes.")
+          + str(time.time() - t0)[:-15] + " secs. Or " + str((time.time() - t0) / 60)[:-15] + " minutes.")
 
 
 if __name__ == "__main__":
@@ -83,3 +90,4 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     main(args.quarter)
+    # main('last')

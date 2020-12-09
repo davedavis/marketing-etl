@@ -22,23 +22,25 @@ from bingads.v13.reporting import *
 
 from dg_microsoft.base_reports.campaignmanagement_example_helper import output_status_message
 from dg_microsoft.base_reports.output_helper import output_webfault_errors
-from dg_db import storage
+
+
 from dg_config import settingsfile
 from dg_microsoft.report_types import get_report_type
-from dg_utils.clean_country import clean_country_name
-from dg_utils.get_quarter_week import get_week_in_quarter
-from dg_utils.print_debug_headers import print_bing_qtd_accounts_headers
+
 
 # Init settings
 settings = settingsfile.get_settings()
 
 # You must provide credentials in auth.py.
-authorization_data = AuthorizationData(account_id=None, customer_id=None, developer_token=DEVELOPER_TOKEN,
+authorization_data = AuthorizationData(account_id=None,
+                                       customer_id=None,
+                                       developer_token=DEVELOPER_TOKEN,
                                        authentication=None, )
 
 # Create a reporting service manager object.
 reporting_service_manager = ReportingServiceManager(authorization_data=authorization_data,
-                                                    poll_interval_in_milliseconds=5000, environment=ENVIRONMENT, )
+                                                    poll_interval_in_milliseconds=5000,
+                                                    environment=ENVIRONMENT, )
 
 REPORT_FILE_FORMAT = settings['microsoft_report_format']
 

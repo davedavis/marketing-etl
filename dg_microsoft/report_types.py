@@ -19,7 +19,6 @@ reporting_service = ServiceClient(service='ReportingService', version=13, author
 
 
 def get_report_type(report_type, start_date, end_date):
-
     if report_type == 'accounts':
         report = get_account_report_type(start_date, end_date)
 
@@ -28,6 +27,9 @@ def get_report_type(report_type, start_date, end_date):
 
     elif report_type == 'ads':
         report = get_search_ads_report_type(start_date, end_date)
+
+    elif report_type == 'shopping':
+        report = get_shopping_ads_report_type(start_date, end_date)
 
     else:
         print("You need to provide a Microsoft Ads report type like 'accounts', 'campaigns' or 'ads'.")
@@ -104,7 +106,6 @@ def get_campaign_report_type(start_date, end_date):
         'AccountNumber',
         'CampaignId',
         'CampaignName',
-        'DeviceType',
         'Network',
         'Impressions',
         'Clicks',
@@ -133,7 +134,7 @@ def get_search_ads_report_type(start_date, end_date):
     report_request.Format = REPORT_FILE_FORMAT
     report_request.ReturnOnlyCompleteData = settings['microsoft_report_return_only_complete_data']
     report_request.Time = report_time
-    report_request.ReportName = "My Ad Performance Report"
+    report_request.ReportName = "My Microsoft Ads Search Ad Performance Report"
     scope = reporting_service.factory.create('AccountThroughAdGroupReportScope')
     scope.AccountIds = {'long': [microsoft_accounts]}
     report_request.Scope = scope
@@ -153,7 +154,6 @@ def get_search_ads_report_type(start_date, end_date):
         'Ctr',
         'AverageCpc',
         'Spend',
-        'AdGroupId',
         'AdTitle',
         'AdDescription',
         'AdDescription2',
@@ -163,6 +163,51 @@ def get_search_ads_report_type(start_date, end_date):
         'TitlePart3',
         'Path1',
         'Path2'
+    ])
+
+    report_request.Columns = report_columns
+
+    return report_request
+
+
+def get_shopping_ads_report_type(start_date, end_date):
+    report_time = reporting_service.factory.create('ReportTime')
+    report_time.CustomDateRangeEnd.Day = end_date.day
+    report_time.CustomDateRangeEnd.Month = end_date.month
+    report_time.CustomDateRangeEnd.Year = end_date.year
+    report_time.CustomDateRangeStart.Day = start_date.day
+    report_time.CustomDateRangeStart.Month = start_date.month
+    report_time.CustomDateRangeStart.Year = start_date.year
+    report_time.ReportTimeZone = settings['microsoft_report_timezone']
+
+    report_request = reporting_service.factory.create('ProductDimensionPerformanceReportRequest')
+    report_request.Aggregation = settings['microsoft_report_aggregation']
+    report_request.ExcludeColumnHeaders = settings['microsoft_report_exclude_column_headers']
+    report_request.ExcludeReportFooter = settings['microsoft_report_exclude_report_footer']
+    report_request.ExcludeReportHeader = settings['microsoft_report_exclude_report_header']
+    report_request.Format = REPORT_FILE_FORMAT
+    report_request.ReturnOnlyCompleteData = settings['microsoft_report_return_only_complete_data']
+    report_request.Time = report_time
+    report_request.ReportName = "My Microsoft Ads Shopping Ad Performance Report"
+    scope = reporting_service.factory.create('AccountThroughAdGroupReportScope')
+    scope.AccountIds = {'long': [microsoft_accounts]}
+    report_request.Scope = scope
+
+    report_columns = reporting_service.factory.create('ArrayOfProductDimensionPerformanceReportColumn')
+    report_columns.ProductDimensionPerformanceReportColumn.append([
+        'TimePeriod',
+        'AccountName',
+        'AdGroupName',
+        'AccountNumber',
+        'CampaignName',
+        'CurrencyCode',
+        'Title',
+        'Price',
+        'Impressions',
+        'Clicks',
+        'Ctr',
+        'AverageCpc',
+        'Spend'
     ])
 
     report_request.Columns = report_columns

@@ -18,13 +18,15 @@ import fiscalyear
 # Set up the date range object settings
 fiscalyear.setup_fiscal_calendar(start_month=4)
 current_quarter = fiscalyear.FiscalQuarter.current()
+last_quarter = fiscalyear.FiscalQuarter.prev_quarter
 
 # Last Quarter Settings
-lenovo_fiscal_year = fiscalyear.FiscalYear(2021)
-last_quarter_start_date = lenovo_fiscal_year.q1.start.strftime('%Y-%m-%d')
-last_quarter_end_date = lenovo_fiscal_year.q1.end.strftime('%Y-%m-%d')
-bing_last_quarter_start = lenovo_fiscal_year.q1.start
-bing_last_quarter_end = lenovo_fiscal_year.q1.end
+# ToDo: Calculate hard coded Q2 in last quarter and remove lnv.
+company_fiscal_year = fiscalyear.FiscalYear(2021)
+last_quarter_start_date = company_fiscal_year.q2.start.strftime('%Y-%m-%d')
+last_quarter_end_date = company_fiscal_year.q2.end.strftime('%Y-%m-%d')
+bing_last_quarter_start = company_fiscal_year.q2.start
+bing_last_quarter_end = company_fiscal_year.q2.end
 google_last_quarter_date_range = f'"{last_quarter_start_date}" AND "{last_quarter_end_date}"'
 
 # Current quarter settings.
