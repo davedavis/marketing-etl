@@ -380,7 +380,6 @@ def write_microsoft_shopping_ads_report(report_results):
     ads_report_records_to_insert = []
 
     for record in report_results:
-        # Check and make sure an empty string wasn't received. Bing... I want to strangle you!
         if record.value('Ctr'):
             report_formatted_ctr = float(record.value('Ctr').strip('%'))
         else:
