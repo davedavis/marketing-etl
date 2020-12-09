@@ -73,7 +73,7 @@ def build_microsoft_report_object(start_date, end_date, report_type):
 
         report_record_iterable = report_container.report_records
 
-        # Return the report for
+        # Return the report and send to the DB write module.
         return report_record_iterable
 
         # ToDo: Close the container

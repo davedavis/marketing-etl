@@ -31,8 +31,6 @@ class AdReportRecord(Base):
     description_2 = Column(String(length=512))
     path_1 = Column(String(length=64))
     path_2 = Column(String(length=64))
-    dsa_Description_1 = Column(String(length=512))
-    dsa_Description_2 = Column(String(length=512))
     rsa_headline_1 = Column(String(length=128))
     rsa_headline_2 = Column(String(length=128))
     rsa_headline_3 = Column(String(length=128))

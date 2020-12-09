@@ -13,9 +13,11 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-""" App that tracks the spend, revenue, E/R, Conversion Rate, CTR and percentage attainment in paid search by country
-    and campaign type and generates"""
+""" App that pulls account reports, campaign reports, and ads reports from both Google and Bing and stores them in
+    a database for report generation"""
 import argparse
+import time
+
 from dg_config.settingsfile import get_settings
 from dg_date import daterange
 from dg_db.db_utils import init_db
@@ -30,8 +32,13 @@ def main(quarter):
     print('Tracker Running...')
     print(f"Running for {quarter} quarter")
 
+    # For timing the running of the app.
+    t0 = time.time()
+    print('Timer started...')
+
     # Truncate and setup database tables with SQLAlchemy
     init_db()
+    print('Truncating database tables...')
 
     # Set date range.
     if quarter == "this":
@@ -51,13 +58,19 @@ def main(quarter):
 
     # Get Google Ads reports
     google_ads_report_builder.get_report(google_date_range, report_type="accounts")
+    # google_ads_report_builder.get_report(google_date_range, report_type="campaigns")
+    # google_ads_report_builder.get_report(google_date_range, report_type="ads")
+    # google_ads_report_builder.get_report(google_date_range, report_type="shopping")
 
     # Get Microsoft Ads reports
     # ToDo: Implement using direct call to date range function (move into if statement)
-
-    microsoft_ads_report_builder.get_report(bing_date_range_start, bing_date_range_end, report_type="accounts")
+    # microsoft_ads_report_builder.get_report(bing_date_range_start, bing_date_range_end, report_type="accounts")
     # microsoft_ads_report_builder.get_report(bing_date_range_start, bing_date_range_end, report_type="campaigns")
     # microsoft_ads_report_builder.get_report(bing_date_range_start, bing_date_range_end, report_type="ads")
+
+    # End of the app run, calculate the total time it took.
+    print("Time to get all the reports and write them all to the database today is "
+          + str(time.time() - t0)[:-16] + " secs. Or " + str((time.time() - t0) / 60)[:-16] + " minutes.")
 
 
 if __name__ == "__main__":

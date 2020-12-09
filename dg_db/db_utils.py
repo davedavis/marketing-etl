@@ -35,7 +35,3 @@ def get_session():
     new_session = Session()
     return new_session
 
-
-# ToDo: Implement this
-def truncate_db():
-    pass

@@ -30,7 +30,7 @@ def get_report_type(report_type, start_date, end_date):
         report = get_search_ads_report_type(start_date, end_date)
 
     else:
-        print("You need to provide a report type like 'accounts', 'campaigns' or 'ads'.")
+        print("You need to provide a Microsoft Ads report type like 'accounts', 'campaigns' or 'ads'.")
         report = None
 
     return report

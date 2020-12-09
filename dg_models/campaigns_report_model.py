@@ -16,7 +16,7 @@ class CampaignReportRecord(Base):
     time_period = Column(Date)
     week = Column(Integer)
     campaign = Column(String(length=512))
-    campaign_id = Column(Integer)
+    campaign_id = Column(String(length=64))
     network = Column(String(length=64))
     impressions = Column(Float)
     clicks = Column(Float)
