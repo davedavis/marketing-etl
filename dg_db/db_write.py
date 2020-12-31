@@ -170,6 +170,17 @@ def write_google_search_ads_report(report_results):
         # Search, Shopping, Display, Display Select etc.
         channel = GoogleAdsClient.get_type('AdvertisingChannelTypeEnum')
 
+        # Switch descriptions for DSAs and normal ETAs
+        if record.ad_group_ad.ad.expanded_dynamic_search_ad.description:
+            description1 = record.ad_group_ad.ad.expanded_dynamic_search_ad.description
+        else:
+            description1 = record.ad_group_ad.ad.expanded_text_ad.description
+
+        if record.ad_group_ad.ad.expanded_dynamic_search_ad.description2:
+            description2 = record.ad_group_ad.ad.expanded_dynamic_search_ad.description2
+        else:
+            description2 = record.ad_group_ad.ad.expanded_text_ad.description2
+
         # Build the record for insertion.
         report_record = AdReportRecord(platform='Google',
                                        account_name=clean_country_name(record.customer.descriptive_name),
@@ -189,8 +200,8 @@ def write_google_search_ads_report(report_results):
                                        headline_1=record.ad_group_ad.ad.expanded_text_ad.headline_part1,
                                        headline_2=record.ad_group_ad.ad.expanded_text_ad.headline_part2,
                                        headline_3=record.ad_group_ad.ad.expanded_text_ad.headline_part3,
-                                       description_1=record.ad_group_ad.ad.expanded_dynamic_search_ad.description,
-                                       description_2=record.ad_group_ad.ad.expanded_dynamic_search_ad.description2,
+                                       description_1=description1,
+                                       description_2=description2,
                                        rsa_headline_1=rsa_headline_list[0],
                                        rsa_headline_2=rsa_headline_list[1],
                                        rsa_headline_3=rsa_headline_list[2],

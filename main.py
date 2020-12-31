@@ -13,11 +13,10 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-""" App that pulls account reports, campaign reports, and ads reports from both Google and Bing and stores them in
-    a database for report generation"""
+""" App that populates a database of paid media platform cost data on three dimensions.
+    Account, Campaign and Ad levels."""
 import argparse
 import time
-from tqdm import tqdm as tqdm
 
 from dg_config.settingsfile import get_settings
 from dg_date import daterange
@@ -70,7 +69,6 @@ def main(quarter):
 
     google_ads_report_builder.get_report(google_date_range, report_type="ads")
     microsoft_ads_report_builder.get_report(bing_date_range_start, bing_date_range_end, report_type="ads")
-    time.sleep(10)
 
     google_ads_report_builder.get_report(google_date_range, report_type="shopping")
     microsoft_ads_report_builder.get_report(bing_date_range_start, bing_date_range_end, report_type="shopping")
@@ -89,5 +87,5 @@ if __name__ == "__main__":
                         help="The quarter you want the report for ('this' is default or 'last' for backfill)")
     args = parser.parse_args()
 
-    main(args.quarter)
-    # main('last')
+    # main(args.quarter)
+    main('last')

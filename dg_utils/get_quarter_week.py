@@ -1,5 +1,4 @@
-from datetime import timedelta, datetime, date
-import typing
+from datetime import timedelta, date
 from dateutil import relativedelta
 
 NEXT_MONDAY = relativedelta.relativedelta(weekday=relativedelta.MO)
