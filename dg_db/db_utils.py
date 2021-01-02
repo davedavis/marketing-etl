@@ -13,20 +13,6 @@ settings = settingsfile.get_settings()
 
 
 def init_db():
-    # Truncate the existing tables.
-    # ToDo: Clean up first commented out version later.
-    # with contextlib.closing(engine.connect()) as con:
-    #     trans = con.begin()
-    #     for table in engine.table_names():
-    #         con.execute("DROP table " + table)
-    #     trans.commit()
-
-    # with contextlib.closing(engine.connect()) as con:
-    #     trans = con.begin()
-    #     for table in reversed(Base.metadata.sorted_tables):
-    #         con.execute(table.drop())
-    #     trans.commit()
-
     Base.metadata.drop_all(engine)
     Base.metadata.create_all()
 

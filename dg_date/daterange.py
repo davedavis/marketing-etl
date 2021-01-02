@@ -16,17 +16,25 @@
 import fiscalyear
 
 # Set up the date range object settings
-fiscalyear.setup_fiscal_calendar(start_month=4)
+fiscalyear.setup_fiscal_calendar(start_year='same', start_month=4)
 current_quarter = fiscalyear.FiscalQuarter.current()
 last_quarter = fiscalyear.FiscalQuarter.prev_quarter
 
 # Last Quarter Settings
-# ToDo: Calculate hard coded Q2 in last quarter
+# ToDo: Delete comments
 company_fiscal_year = fiscalyear.FiscalYear(2021)
-last_quarter_start_date = company_fiscal_year.q2.start.strftime('%Y-%m-%d')
-last_quarter_end_date = company_fiscal_year.q2.end.strftime('%Y-%m-%d')
-bing_last_quarter_start = company_fiscal_year.q2.start
-bing_last_quarter_end = company_fiscal_year.q2.end
+last_quarter_start_date = fiscalyear.FiscalQuarter.current().prev_quarter.start.strftime('%Y-%m-%d')
+last_quarter_end_date = fiscalyear.FiscalQuarter.current().prev_quarter.end.strftime('%Y-%m-%d')
+
+# last_quarter_start_date = company_fiscal_year.q3.start.strftime('%Y-%m-%d')
+# last_quarter_end_date = company_fiscal_year.q3.end.strftime('%Y-%m-%d')
+
+# bing_last_quarter_start = company_fiscal_year.q3.start
+# bing_last_quarter_end = company_fiscal_year.q3.end
+
+bing_last_quarter_start = fiscalyear.FiscalQuarter.current().prev_quarter.start
+bing_last_quarter_end = fiscalyear.FiscalQuarter.current().prev_quarter.end
+
 google_last_quarter_date_range = f'"{last_quarter_start_date}" AND "{last_quarter_end_date}"'
 
 # Current quarter settings.
