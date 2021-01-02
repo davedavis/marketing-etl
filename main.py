@@ -18,6 +18,8 @@
 import argparse
 import time
 
+import fiscalyear
+
 from dg_config.settingsfile import get_settings
 import dg_utils.timing
 from dg_date import daterange
@@ -31,7 +33,7 @@ settings = get_settings()
 def main(quarter):
     """ Main method that calls all the worker modules """
     print('Tracker Running...')
-    print(f"Running for {quarter} quarter")
+    print(f"Running for quarter {quarter} ")
 
     # Truncate and setup database tables with SQLAlchemy
     print('Truncating database tables...')
@@ -40,33 +42,24 @@ def main(quarter):
 
     # Set date range.
     print('Calculating date range for reports..')
-    if quarter == "this":
-        google_date_range = daterange.google_thisq()
-        bing_date_range_start = daterange.bing_thisq_start()
-        bing_date_range_end = daterange.bing_thisq_end()
-        print("Google Date Range is: ", google_date_range)
-        print("Bing Date Range is: ", bing_date_range_start, bing_date_range_end)
-    elif quarter == "last":
-        google_date_range = daterange.google_lastq()
-        bing_date_range_start = daterange.bing_lastq_start()
-        bing_date_range_end = daterange.bing_lastq_end()
-        print("Google Date Range is: ", google_date_range)
-        print("Bing Date Range is: ", bing_date_range_start, bing_date_range_end)
-    else:
-        print("Sorry, reporting further back from last quarter is not supported yet, contact Dave if you need this.")
+
+    google_date_range = daterange.get_google_date_range(quarter)
+    bing_date_range_start, bing_date_range_end = daterange.get_bing_date_range(quarter)
+    print("Google Date Range is: ", google_date_range)
+    print("Bing Date Range is: ", bing_date_range_start, bing_date_range_end)
 
     # Initialize the report retrieval flow. Stagger platforms & sleep for rate limiting.
     google_ads_report_builder.get_report(google_date_range, report_type="accounts")
     microsoft_ads_report_builder.get_report(bing_date_range_start, bing_date_range_end, report_type="accounts")
-    time.sleep(10)
-
+    # time.sleep(10)
+    #
     google_ads_report_builder.get_report(google_date_range, report_type="campaigns")
     microsoft_ads_report_builder.get_report(bing_date_range_start, bing_date_range_end, report_type="campaigns")
-    time.sleep(10)
-
+    # time.sleep(10)
+    #
     google_ads_report_builder.get_report(google_date_range, report_type="ads")
     microsoft_ads_report_builder.get_report(bing_date_range_start, bing_date_range_end, report_type="ads")
-
+    #
     google_ads_report_builder.get_report(google_date_range, report_type="shopping")
     microsoft_ads_report_builder.get_report(bing_date_range_start, bing_date_range_end, report_type="shopping")
 
@@ -75,10 +68,9 @@ if __name__ == "__main__":
     # Set up argparse and support reporting for previous quarter.
     parser = argparse.ArgumentParser(description="Updates or backfills SEM platform reporting.")
     parser.add_argument("-q", "--quarter",
-                        type=str,
-                        default="this",
-                        help="The quarter you want the report for ('this' is default or 'last' for backfill)")
+                        type=int,
+                        default=fiscalyear.FiscalQuarter.current().quarter,
+                        help="The quarter period as an integer. 1, 2, 3 or 4 which will be for the current fiscal year.")
     args = parser.parse_args()
 
-    # main(args.quarter)
-    main('last')
+    main(args.quarter)

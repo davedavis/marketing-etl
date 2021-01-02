@@ -1,3 +1,5 @@
+import sys
+
 from sqlalchemy import Column, Integer, String, Date, Float
 from dg_config import settingsfile
 from dg_models.base_model import Base
@@ -6,7 +8,7 @@ settings = settingsfile.get_settings()
 
 
 class CampaignReportRecord(Base):
-    __tablename__ = 'campaignsReport'
+    __tablename__ = 'Q'+sys.argv[2]+'_campaignsReport'
     __tableargs__ = {'schema': settings['db_database']}
 
     report_id = Column(Integer, primary_key=True)

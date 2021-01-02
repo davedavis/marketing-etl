@@ -12,6 +12,7 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
+import datetime
 
 import fiscalyear
 
@@ -22,7 +23,7 @@ last_quarter = fiscalyear.FiscalQuarter.prev_quarter
 
 # Last Quarter Settings
 # ToDo: Delete comments
-company_fiscal_year = fiscalyear.FiscalYear(2021)
+company_fiscal_year = fiscalyear.FiscalYear(2020)
 last_quarter_start_date = fiscalyear.FiscalQuarter.current().prev_quarter.start.strftime('%Y-%m-%d')
 last_quarter_end_date = fiscalyear.FiscalQuarter.current().prev_quarter.end.strftime('%Y-%m-%d')
 
@@ -76,6 +77,51 @@ def bing_thisq_end():
     return bing_current_quarter_end
 
 
+def get_google_date_range(quarter):
+    google_start_date = ""
+    google_end_date = ""
+
+    if quarter == 1:
+        google_start_date = company_fiscal_year.q1.start.strftime('%Y-%m-%d')
+        google_end_date = company_fiscal_year.q1.end.strftime('%Y-%m-%d')
+    elif quarter == 2:
+        google_start_date = company_fiscal_year.q2.start.strftime('%Y-%m-%d')
+        google_end_date = company_fiscal_year.q2.end.strftime('%Y-%m-%d')
+    elif quarter == 3:
+        google_start_date = company_fiscal_year.q3.start.strftime('%Y-%m-%d')
+        google_end_date = company_fiscal_year.q3.end.strftime('%Y-%m-%d')
+    elif quarter == 4:
+        google_start_date = company_fiscal_year.q4.start.strftime('%Y-%m-%d')
+        google_end_date = company_fiscal_year.q4.end.strftime('%Y-%m-%d')
+    else:
+        print("You didn't pass in a valid quarter number. Options are 1, 2, 3 or 4")
+
+    google_formatted_date_range = f'"{google_start_date}" AND "{google_end_date}"'
+    return google_formatted_date_range
 
 
+def get_bing_date_range(quarter):
+    bing_start_date = ""
+    bing_end_date = ""
 
+    if quarter == 1:
+        bing_start_date = company_fiscal_year.q1.start
+        bing_end_date = company_fiscal_year.q1.end
+    elif quarter == 2:
+        bing_start_date = company_fiscal_year.q2.start
+        bing_end_date = company_fiscal_year.q2.end
+    elif quarter == 3:
+        bing_start_date = company_fiscal_year.q3.start
+        bing_end_date = company_fiscal_year.q3.end
+    elif quarter == 4:
+        bing_start_date = company_fiscal_year.q4.start
+        bing_end_date = company_fiscal_year.q4.end
+    else:
+        print("You didn't pass in a valid quarter number. Options are 1, 2, 3 or 4")
+
+    # If the requested quarter is this quarter, set the end date to today, and not the end of the quarter as Microsoft
+    # Ads doesn't support using future dates (and ignoring them) in the API like Google does.
+    if fiscalyear.FiscalQuarter.current().quarter == quarter:
+        bing_end_date = datetime.datetime.now()
+
+    return bing_start_date, bing_end_date
