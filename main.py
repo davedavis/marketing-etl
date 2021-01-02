@@ -19,6 +19,7 @@ import argparse
 import time
 
 from dg_config.settingsfile import get_settings
+import dg_utils.timing
 from dg_date import daterange
 from dg_db.db_utils import init_db
 from dg_google import google_ads_report_builder
@@ -31,10 +32,6 @@ def main(quarter):
     """ Main method that calls all the worker modules """
     print('Tracker Running...')
     print(f"Running for {quarter} quarter")
-
-    # For timing the running of the app.
-    t0 = time.time()
-    print('App runtime timer started...')
 
     # Truncate and setup database tables with SQLAlchemy
     print('Truncating database tables...')
@@ -72,10 +69,6 @@ def main(quarter):
 
     google_ads_report_builder.get_report(google_date_range, report_type="shopping")
     microsoft_ads_report_builder.get_report(bing_date_range_start, bing_date_range_end, report_type="shopping")
-
-    # End of the app run, calculate the total time it took.
-    print("Time to get all the reports and write them all to the database today is "
-          + str(time.time() - t0)[:-15] + " secs. Or " + str((time.time() - t0) / 60)[:-15] + " minutes.")
 
 
 if __name__ == "__main__":
