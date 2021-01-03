@@ -9,6 +9,7 @@ settings = settingsfile.get_settings()
 
 
 class AccountReportRecord(Base):
+    # Set the table name based on the program arguments.
     __tablename__ = 'Q'+sys.argv[2]+'_accountsReport'
     __tableargs__ = {'schema': settings['db_database']}
 

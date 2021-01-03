@@ -64,6 +64,7 @@ def main(quarter):
     microsoft_ads_report_builder.get_report(bing_date_range_start, bing_date_range_end, report_type="shopping")
 
 
+# ToDo: Make args a global variable instead of accessing them directly in the model for dynamic table creation.
 if __name__ == "__main__":
     # Set up argparse and support reporting for previous quarter.
     parser = argparse.ArgumentParser(description="Updates or backfills SEM platform reporting.")
