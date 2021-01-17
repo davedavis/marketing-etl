@@ -16,6 +16,7 @@ class AccountReportRecord(Base):
     report_id = Column(Integer, primary_key=True)
     platform = Column(String(length=64))
     account_name = Column(String(length=64))
+    account_region = Column(String(length=64))
     account_number = Column(String(length=64))
     time_period = Column(Date)
     week = Column(Integer)

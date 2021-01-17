@@ -33,6 +33,8 @@ from dg_utils.clean_country import clean_country_name
 from dg_utils.get_quarter_week import get_week_in_quarter
 
 # Init settings
+from dg_utils.region_converter import get_region
+
 settings = settingsfile.get_settings()
 
 
@@ -85,6 +87,7 @@ def write_google_accounts_report(report_results):
     for record in report_results:
         report_record = AccountReportRecord(platform="Google",
                                             account_name=clean_country_name(record.customer.descriptive_name),
+                                            account_region=get_region(record.customer.descriptive_name),
                                             account_number=record.customer.resource_name.split("/")[1],
                                             time_period=record.segments.date,
                                             week=get_week_in_quarter(datetime.strptime(record.segments.date, "%Y-%m-%d")),
@@ -288,6 +291,7 @@ def write_microsoft_accounts_report(report_results):
     for record in report_results:
         report_record = AccountReportRecord(platform='Microsoft',
                                             account_name=clean_country_name(record.value('AccountName')),
+                                            account_region=get_region(record.value('AccountName')),
                                             account_number=record.value('AccountNumber'),
                                             time_period=record.value('TimePeriod'),
                                             week=get_week_in_quarter(datetime.strptime(record.value('TimePeriod'), '%Y-%m-%d')),
