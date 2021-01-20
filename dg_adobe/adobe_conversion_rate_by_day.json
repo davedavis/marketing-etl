@@ -1,0 +1,99 @@
+{
+    "rsid": "lenovoglobal",
+    "globalFilters": [
+        {
+            "type": "segment",
+            "segmentDefinition": {
+                "container": {
+                    "func": "container",
+                    "context": "hits",
+                    "pred": {
+                        "func": "streq",
+                        "str": "SEM",
+                        "val": {
+                            "func": "attr",
+                            "name": "variables/campaign.6"
+                        },
+                        "description": "Program"
+                    }
+                },
+                "func": "segment",
+                "version": [
+                    1,
+                    0,
+                    0
+                ]
+            }
+        },
+        {
+            "type": "segment",
+            "segmentId": "s300001357_5b75470a03d38340b61fd802"
+        },
+        {
+            "type": "dateRange",
+            "dateRange": "2021-01-01T00:00:00.000/2021-01-04T00:00:00.000"
+        }
+    ],
+    "metricContainer": {
+        "metrics": [
+            {
+                "columnId": "1",
+                "id": "cm_visits_orders_defaultmetric",
+                "sort": "desc",
+                "filters": [
+                    "0"
+                ]
+            },
+            {
+                "columnId": "2",
+                "id": "cm_visits_orders_defaultmetric",
+                "filters": [
+                    "1"
+                ]
+            },
+            {
+                "columnId": "3",
+                "id": "cm_visits_orders_defaultmetric",
+                "filters": [
+                    "2"
+                ]
+            }
+        ],
+        "metricFilters": [
+            {
+                "id": "0",
+                "type": "breakdown",
+                "dimension": "variables/daterangeday",
+                "itemId": "1210001"
+            },
+            {
+                "id": "1",
+                "type": "breakdown",
+                "dimension": "variables/daterangeday",
+                "itemId": "1210002"
+            },
+            {
+                "id": "2",
+                "type": "breakdown",
+                "dimension": "variables/daterangeday",
+                "itemId": "1210003"
+            }
+        ]
+    },
+    "dimension": "variables/evar5",
+    "search": {
+        "clause": "( CONTAINS 'DE' ) OR ( CONTAINS 'CH' ) OR ( CONTAINS 'AT' ) OR ( CONTAINS 'UK' ) OR ( CONTAINS 'IE' ) OR ( CONTAINS 'SE' ) OR ( CONTAINS 'NO' ) OR ( CONTAINS 'FI' ) OR ( CONTAINS 'DK' ) OR ( CONTAINS 'BE' ) OR ( CONTAINS 'NL' ) OR ( CONTAINS 'FR' ) OR ( CONTAINS 'PT' ) OR ( CONTAINS 'ES' ) OR ( CONTAINS 'IT' )"
+    },
+    "settings": {
+        "countRepeatInstances": true,
+        "limit": 400,
+        "page": 0,
+        "nonesBehavior": "exclude-nones"
+    },
+    "statistics": {
+        "functions": [
+            "col-max",
+            "col-min"
+        ]
+    }
+}

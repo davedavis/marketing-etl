@@ -39,6 +39,7 @@ import dg_utils.timing
 import fiscalyear
 import argparse
 
+from dg_adobe import adobe_report_builder
 from dg_config.settingsfile import get_settings
 from dg_date import daterange
 from dg_db.db_utils import init_db
@@ -69,25 +70,33 @@ def main(quarter):
     print('Calculating date range for reports..')
     google_date_range = daterange.get_google_date_range(quarter)
     bing_date_range_start, bing_date_range_end = daterange.get_bing_date_range(quarter)
+
+    # ToDo: Create a real Adobe Date range in the daterange module.
+    adobe_date_range = google_date_range
     print("Google Date Range is: ", google_date_range)
     print("Bing Date Range is: ", bing_date_range_start, bing_date_range_end)
 
-    # Initialize the report retrieval flow. Stagger platforms & sleep for rate limiting.
-    # Start the Accounts report flow for all platforms.
-    google_ads_report_builder.get_report(google_date_range, report_type="accounts")
-    microsoft_ads_report_builder.get_report(bing_date_range_start, bing_date_range_end, report_type="accounts")
+    # # Initialize the report retrieval flow. Stagger platforms & sleep for rate limiting.
+    # # Start the Accounts report flow for all platforms.
+    # google_ads_report_builder.get_report(google_date_range, report_type="accounts")
+    # microsoft_ads_report_builder.get_report(bing_date_range_start, bing_date_range_end, report_type="accounts")
+    #
+    # # Start the Campaigns report flow for all platforms.
+    # google_ads_report_builder.get_report(google_date_range, report_type="campaigns")
+    # microsoft_ads_report_builder.get_report(bing_date_range_start, bing_date_range_end, report_type="campaigns")
+    #
+    # # Start the Search Ads report flow for all platforms.
+    # google_ads_report_builder.get_report(google_date_range, report_type="ads")
+    # microsoft_ads_report_builder.get_report(bing_date_range_start, bing_date_range_end, report_type="ads")
+    #
+    # # Start the Shopping Ads report flow for all platforms.
+    # google_ads_report_builder.get_report(google_date_range, report_type="shopping")
+    # microsoft_ads_report_builder.get_report(bing_date_range_start, bing_date_range_end, report_type="shopping")
 
-    # Start the Campaigns report flow for all platforms.
-    google_ads_report_builder.get_report(google_date_range, report_type="campaigns")
-    microsoft_ads_report_builder.get_report(bing_date_range_start, bing_date_range_end, report_type="campaigns")
+    # Start the Adobe Revenue report flow.
+    adobe_report_builder.get_report(adobe_date_range, report_type="revenue")
+    # adobe_report_builder.get_report(adobe_date_range, report_type="conversion_rate")
 
-    # Start the Search Ads report flow for all platforms.
-    google_ads_report_builder.get_report(google_date_range, report_type="ads")
-    microsoft_ads_report_builder.get_report(bing_date_range_start, bing_date_range_end, report_type="ads")
-
-    # Start the Shopping Ads report flow for all platforms.
-    google_ads_report_builder.get_report(google_date_range, report_type="shopping")
-    microsoft_ads_report_builder.get_report(bing_date_range_start, bing_date_range_end, report_type="shopping")
 
 
 # ToDo: Make args a global variable instead of accessing them directly in the model for dynamic table creation.

@@ -57,6 +57,28 @@ def write_google_report_to_db(report_results, report_type):
         print("You need to provide a Google Ads report type like 'accounts', 'campaigns', 'ads' or 'shopping.")
 
 
+def write_adobe_report_to_db(report_results, report_type):
+    print(f"Adobe {report_type} report received, writing to DB...")
+
+
+    if report_type == 'revenue':
+        write_adobe_revenue_report(report_results)
+
+    elif report_type == 'conversion_rate':
+        write_adobe_conversion_rate_report(report_results)
+
+    else:
+        print("You need to provide an report type like 'revenue' or 'conversion_rate.")
+
+
+def write_adobe_revenue_report(report_results):
+    pass
+
+
+def write_adobe_conversion_rate_report(report_results):
+    pass
+
+
 def write_microsoft_report_to_db(report_results, report_type):
     print(f"Microsoft {report_type} report received, writing to DB...")
 
@@ -90,7 +112,8 @@ def write_google_accounts_report(report_results):
                                             account_region=get_region(record.customer.descriptive_name),
                                             account_number=record.customer.resource_name.split("/")[1],
                                             time_period=record.segments.date,
-                                            week=get_week_in_quarter(datetime.strptime(record.segments.date, "%Y-%m-%d")),
+                                            week=get_week_in_quarter(
+                                                datetime.strptime(record.segments.date, "%Y-%m-%d")),
                                             impressions=record.metrics.impressions,
                                             clicks=record.metrics.clicks,
                                             spend=record.metrics.cost_micros / 1000000)
@@ -123,10 +146,12 @@ def write_google_campaigns_report(report_results):
                                              account_name=clean_country_name(record.customer.descriptive_name),
                                              account_number=record.customer.resource_name.split("/")[1],
                                              time_period=record.segments.date,
-                                             week=get_week_in_quarter(datetime.strptime(record.segments.date, "%Y-%m-%d")),
+                                             week=get_week_in_quarter(
+                                                 datetime.strptime(record.segments.date, "%Y-%m-%d")),
                                              campaign=record.campaign.name,
                                              campaign_id=record.campaign.id,
-                                             network=channel.AdvertisingChannelType.Name(record.campaign.advertising_channel_type).title(),
+                                             network=channel.AdvertisingChannelType.Name(
+                                                 record.campaign.advertising_channel_type).title(),
                                              impressions=record.metrics.impressions,
                                              clicks=record.metrics.clicks,
                                              spend=record.metrics.cost_micros / 1000000)
@@ -197,7 +222,8 @@ def write_google_search_ads_report(report_results):
                                        spend=record.metrics.cost_micros / 1000000,
                                        ctr=record.metrics.ctr * 100,
                                        average_cpc=record.metrics.average_cpc / 1000000,
-                                       ad_type=channel.AdvertisingChannelType.Name(record.campaign.advertising_channel_type).title(),
+                                       ad_type=channel.AdvertisingChannelType.Name(
+                                           record.campaign.advertising_channel_type).title(),
                                        path_1=record.ad_group_ad.ad.expanded_text_ad.path1,
                                        path_2=record.ad_group_ad.ad.expanded_text_ad.path2,
                                        headline_1=record.ad_group_ad.ad.expanded_text_ad.headline_part1,
@@ -294,7 +320,8 @@ def write_microsoft_accounts_report(report_results):
                                             account_region=get_region(record.value('AccountName')),
                                             account_number=record.value('AccountNumber'),
                                             time_period=record.value('TimePeriod'),
-                                            week=get_week_in_quarter(datetime.strptime(record.value('TimePeriod'), '%Y-%m-%d')),
+                                            week=get_week_in_quarter(
+                                                datetime.strptime(record.value('TimePeriod'), '%Y-%m-%d')),
                                             impressions=record.value('Impressions'),
                                             clicks=record.value('Clicks'),
                                             spend=record.value('Spend'))
@@ -324,7 +351,8 @@ def write_microsoft_campaigns_report(report_results):
                                              account_name=clean_country_name(record.value('AccountName')),
                                              account_number=record.value('AccountNumber'),
                                              time_period=record.value('TimePeriod'),
-                                             week=get_week_in_quarter(datetime.strptime(record.value('TimePeriod'), '%Y-%m-%d')),
+                                             week=get_week_in_quarter(
+                                                 datetime.strptime(record.value('TimePeriod'), '%Y-%m-%d')),
                                              campaign=record.value('CampaignName'),
                                              campaign_id=record.value('CampaignId'),
                                              network=record.value('Network'),
@@ -360,7 +388,8 @@ def write_microsoft_search_ads_report(report_results):
                                        account_name=clean_country_name(record.value('AccountName')),
                                        account_number=record.value('AccountNumber'),
                                        time_period=record.value('TimePeriod'),
-                                       week=get_week_in_quarter(datetime.strptime(record.value('TimePeriod'), '%Y-%m-%d')),
+                                       week=get_week_in_quarter(
+                                           datetime.strptime(record.value('TimePeriod'), '%Y-%m-%d')),
                                        campaign=record.value('CampaignName'),
                                        currency='USD',
                                        impressions=record.value('Impressions'),
@@ -404,7 +433,8 @@ def write_microsoft_shopping_ads_report(report_results):
                                        account_name=clean_country_name(record.value('AccountName')),
                                        account_number=record.value('AccountNumber'),
                                        time_period=record.value('TimePeriod'),
-                                       week=get_week_in_quarter(datetime.strptime(record.value('TimePeriod'), '%Y-%m-%d')),
+                                       week=get_week_in_quarter(
+                                           datetime.strptime(record.value('TimePeriod'), '%Y-%m-%d')),
                                        campaign=record.value('CampaignName'),
                                        currency=record.value('CurrencyCode'),
                                        impressions=record.value('Impressions'),
@@ -423,4 +453,5 @@ def write_microsoft_shopping_ads_report(report_results):
     session.commit()
     session.close()
 
-    print("Total time for adding Microsoft shopping ads to the database was " + str(time.time() - tmshop)[:-15] + " secs ")
+    print("Total time for adding Microsoft shopping ads to the database was " + str(time.time() - tmshop)[
+                                                                                :-15] + " secs ")
