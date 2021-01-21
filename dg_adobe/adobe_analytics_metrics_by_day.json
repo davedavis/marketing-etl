@@ -1,0 +1,75 @@
+{
+    "rsid": "lenovoglobal",
+    "globalFilters": [
+        {
+            "type": "segment",
+            "segmentDefinition": {
+                "container": {
+                    "func": "container",
+                    "context": "hits",
+                    "pred": {
+                        "func": "streq",
+                        "str": "SEM",
+                        "val": {
+                            "func": "attr",
+                            "name": "variables/campaign.6"
+                        },
+                        "description": "Program"
+                    }
+                },
+                "func": "segment",
+                "version": [
+                    1,
+                    0,
+                    0
+                ]
+            }
+        },
+        {
+            "type": "segment",
+            "segmentId": "s300001357_5b75470a03d38340b61fd802"
+        },
+        {
+            "type": "segment",
+            "segmentId": "s300001357_598d71608f0c6573e0e828d2"
+        },
+        {
+            "type": "dateRange",
+            "dateRange": "2021-01-04T00:00:00.000/2021-01-05T00:00:00.000"
+        }
+    ],
+    "metricContainer": {
+        "metrics": [
+            {
+                "columnId": "0",
+                "id": "metrics/revenue",
+                "sort": "desc"
+            },
+            {
+                "columnId": "1",
+                "id": "cm_visits_orders_defaultmetric"
+            },
+            {
+                "columnId": "2",
+                "id": "cm300001357_5922ee709b1d235724466406"
+            },
+            {
+                "columnId": "3",
+                "id": "metrics/orders"
+            }
+        ]
+    },
+    "dimension": "variables/evar5",
+    "settings": {
+        "countRepeatInstances": true,
+        "limit": 400,
+        "page": 0,
+        "nonesBehavior": "return-nones"
+    },
+    "statistics": {
+        "functions": [
+            "col-max",
+            "col-min"
+        ]
+    }
+}

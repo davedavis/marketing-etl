@@ -8,7 +8,7 @@ import argparse
 settings = settingsfile.get_settings()
 
 
-class RevenueReportRecord(Base):
+class MetricsReportRecord(Base):
     # Set the table name based on the program arguments.
     __tablename__ = 'Q' + sys.argv[2] + '_analyticsReport'
     __tableargs__ = {'schema': settings['db_database']}
@@ -20,6 +20,7 @@ class RevenueReportRecord(Base):
     week = Column(Integer)
     revenue = Column(Float)
     conversion_rate = Column(Float)
+    orders = Column(Float)
 
     def __repr__(self):
         return f'Account Report: {self.account_name} Week: {self.week} - Revenue: {self.revenue}'

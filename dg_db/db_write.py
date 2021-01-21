@@ -29,6 +29,7 @@ from dg_models.ads_report_model import AdReportRecord
 from dg_config import settingsfile
 
 # Import helper functions
+from dg_models.core_metrics_report_model import MetricsReportRecord
 from dg_utils.clean_country import clean_country_name
 from dg_utils.get_quarter_week import get_week_in_quarter
 
@@ -60,9 +61,8 @@ def write_google_report_to_db(report_results, report_type):
 def write_adobe_report_to_db(report_results, report_type):
     print(f"Adobe {report_type} report received, writing to DB...")
 
-
-    if report_type == 'revenue':
-        write_adobe_revenue_report(report_results)
+    if report_type == 'core_metrics':
+        write_adobe_core_metrics_report(report_results)
 
     elif report_type == 'conversion_rate':
         write_adobe_conversion_rate_report(report_results)
@@ -71,8 +71,36 @@ def write_adobe_report_to_db(report_results, report_type):
         print("You need to provide an report type like 'revenue' or 'conversion_rate.")
 
 
-def write_adobe_revenue_report(report_results):
-    pass
+def write_adobe_core_metrics_report(report_results):
+    # Create a list to contain tuples from the response that we'll add to the database.
+    metrics_report_records_to_insert = []
+
+    # Loop through the returned records and do something with them.
+    for record in report_results:
+        report_record = MetricsReportRecord(account_name=clean_country_name(record[1]),
+                                            account_region=get_region(record[1]),
+                                            time_period=record[0][0],
+                                            week=get_week_in_quarter(record[0][0]),
+                                            revenue=record[0][2],
+                                            conversion_rate=record[0][3],
+                                            orders=record[0][4])
+
+        print(report_record)
+        # session.add(report_record)
+        metrics_report_records_to_insert.append(report_record)
+
+
+
+    # Set up DB session
+    session = get_session()
+    # Bulk save the records from the list
+    session.bulk_save_objects(metrics_report_records_to_insert)
+    # Commit the session
+    session.commit()
+    # Close the session
+    session.close()
+
+    print("Adobe Records added to DB")
 
 
 def write_adobe_conversion_rate_report(report_results):
@@ -104,6 +132,16 @@ def write_google_accounts_report(report_results):
 
     # Create a list to contain tuples from the response that we'll add to the database.
     accounts_report_records_to_insert = []
+
+
+    ##############################################################################################################
+    ##############################################################################################################
+    ##############################################################################################################
+    # Left off here. Dateranges for Adobe are correct and it seems the correct data is now coming back. But the
+    # incorrect data is being written to the DB
+    ##############################################################################################################
+    ##############################################################################################################
+    ##############################################################################################################
 
     # Loop through the returned records and do something with them.
     for record in report_results:

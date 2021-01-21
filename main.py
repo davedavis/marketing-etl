@@ -45,7 +45,9 @@ from dg_date import daterange
 from dg_db.db_utils import init_db
 from dg_google import google_ads_report_builder
 from dg_microsoft import microsoft_ads_report_builder
+from rich.console import Console
 
+console = Console()
 settings = get_settings()
 
 
@@ -70,11 +72,11 @@ def main(quarter):
     print('Calculating date range for reports..')
     google_date_range = daterange.get_google_date_range(quarter)
     bing_date_range_start, bing_date_range_end = daterange.get_bing_date_range(quarter)
+    adobe_date_range_start, adobe_date_range_end = daterange.get_adobe_date_range(quarter)
 
-    # ToDo: Create a real Adobe Date range in the daterange module.
-    adobe_date_range = google_date_range
-    print("Google Date Range is: ", google_date_range)
-    print("Bing Date Range is: ", bing_date_range_start, bing_date_range_end)
+    console.print("Google Date Range is: ", google_date_range)
+    console.print("Bing Date Range is: ", bing_date_range_start, bing_date_range_end)
+    console.print("Adobe Date Range is: ", adobe_date_range_start, adobe_date_range_end)
 
     # # Initialize the report retrieval flow. Stagger platforms & sleep for rate limiting.
     # # Start the Accounts report flow for all platforms.
@@ -94,7 +96,7 @@ def main(quarter):
     # microsoft_ads_report_builder.get_report(bing_date_range_start, bing_date_range_end, report_type="shopping")
 
     # Start the Adobe Revenue report flow.
-    adobe_report_builder.get_report(adobe_date_range, report_type="revenue")
+    adobe_report_builder.get_report(adobe_date_range_start, adobe_date_range_end, report_type="core_metrics")
     # adobe_report_builder.get_report(adobe_date_range, report_type="conversion_rate")
 
 
