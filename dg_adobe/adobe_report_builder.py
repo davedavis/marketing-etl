@@ -17,6 +17,7 @@
 # Init settings
 import datetime
 import json
+import math
 import sys
 from time import strftime, sleep
 
@@ -49,11 +50,9 @@ def get_report(date_range_start, date_range_end, report_type):
     for day in day_list:
         end_of_day = day + datetime.timedelta(hours=24)
         report_date = day.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3] + "/" + end_of_day.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3]
-        console.print(report_date, style="bold red")
 
         # Get the report type and query string.
         query = get_report_type(report_type, report_date)
-        console.print(query)
 
         # Get the report data
         adobe_report_response = requests.post("{}/{}/reports".format(settings["analytics_api_url"], global_company_id),
@@ -64,24 +63,35 @@ def get_report(date_range_start, date_range_end, report_type):
                                                        'Content-Type': 'application/json'},
                                               data=query)
 
-
-
         # ToDo: Add more error checking here, particularly around error codes (403)
+
+        # Take the response and convert it into a list with only the data that we want.
         if adobe_report_response.json() is not None:
-            list_of_cleaned_records = []
-
             response_dict = adobe_report_response.json()
-            for record in response_dict["rows"]:
-                cleaned_record = [day.to_pydatetime(), record["value"], record["data"][0], record["data"][1],
-                                  record["data"][2]]
-                list_of_cleaned_records.append(cleaned_record)
+            # Check for existence of rows
+            if response_dict["rows"]:
+                # Loop through the Adobe record and pluck out what we need into a cleaned record list.
+                for record in response_dict["rows"]:
 
 
-            records_to_insert.append(list_of_cleaned_records)
+                    cleaned_record = [day.to_pydatetime(), record["value"], record["data"][0],
+                                      record["data"][1], record["data"][2], record["data"][3],
+                                      record["data"][4], record["data"][5], record["data"][6]]
+
+                    if cleaned_record[6] == "NaN":
+                        cleaned_record[6] = 0
+                    if cleaned_record[8] == "NaN":
+                        cleaned_record[8] = 0
+
+
+                    # Finally, add the cleaned record list to the list we want to pass to the DB write module.
+                    records_to_insert.append(cleaned_record)
+            else:
+                console.print("A response was received from the Adobe API but it contained no data", style="bold red")
 
         # As we're calling many daily reports, we'll be rate limited. So adding in a delay here.
-        sleep(5)
+        sleep(settings["adobe_api_delay"])
         console.print(records_to_insert)
 
-        # Send the list off to be written.
-        write_adobe_report_to_db(records_to_insert, report_type)
+    # Send the list off to be written.
+    write_adobe_report_to_db(records_to_insert, report_type)

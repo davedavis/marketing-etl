@@ -1,35 +1,42 @@
 def get_region(country_name):
+    # Normalize as Adobe returns names in different cases.
+    normalized_country_name = country_name.casefold().strip()
+
     # North
-    if ' NL' in country_name or 'Netherlands' in country_name:
+    if normalized_country_name == "nl" or normalized_country_name == "netherlands":
         return 'North'
-    elif ' DK' in country_name or 'Denmark' in country_name:
+    elif normalized_country_name == "dk" or normalized_country_name == "denmark":
         return 'North'
-    elif 'SE' in country_name or 'Sweden' in country_name:
+    elif normalized_country_name == "se" or normalized_country_name == "sweden":
         return 'North'
-    elif ' FI' in country_name or 'Finland' in country_name:
+    elif normalized_country_name == "fi" or normalized_country_name == "finland":
         return 'North'
-    elif ' BE' in country_name or 'Belgium' in country_name:
+    elif normalized_country_name == "be" or normalized_country_name == "belgium":
         return 'North'
-    elif 'NO' in country_name or 'Norway' in country_name:
+    elif normalized_country_name == "no" or normalized_country_name == "norway":
         return 'North'
+
     # Central
-    elif ' DE' in country_name or 'Germany' in country_name:
+    elif normalized_country_name == "de" or normalized_country_name == "germany":
         return 'Central'
-    elif ' AT' in country_name or 'Austria' in country_name:
+    elif normalized_country_name == "at" or normalized_country_name == "austria":
         return 'Central'
-    elif ' CH' in country_name or 'Switzerland' in country_name:
+    elif normalized_country_name == "ch" or normalized_country_name == "switzerland":
         return 'Central'
     # South
-    elif ' FR' in country_name or 'France' in country_name:
+    elif normalized_country_name == "fr" or normalized_country_name == "france":
         return 'South'
-    elif ' ES' in country_name or 'Spain' in country_name:
+    elif normalized_country_name == "es" or normalized_country_name == "spain":
         return 'South'
-    elif ' IT' in country_name or 'Italy' in country_name:
+    elif normalized_country_name == "it" or normalized_country_name == "italy":
         return 'South'
-    elif ' PT' in country_name or 'Portugal' in country_name:
+    elif normalized_country_name == "pt" or normalized_country_name == "portugal":
         return 'South'
     # UKI
-    elif ' UK' in country_name or 'Kingdom' in country_name:
+    elif normalized_country_name == "uk" or normalized_country_name == "gb" or normalized_country_name == "united kingdom":
         return 'UKI'
-    elif ' IE' in country_name or 'Ireland' in country_name:
+    elif normalized_country_name == "ie" or normalized_country_name == "ireland":
         return 'UKI'
+
+    else:
+        return "Unknown Region"

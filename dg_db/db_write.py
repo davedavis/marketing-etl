@@ -27,6 +27,9 @@ from dg_models.ads_report_model import AdReportRecord
 
 # Import Settings
 from dg_config import settingsfile
+from rich.console import Console
+
+console = Console()
 
 # Import helper functions
 from dg_models.core_metrics_report_model import MetricsReportRecord
@@ -40,7 +43,7 @@ settings = settingsfile.get_settings()
 
 
 def write_google_report_to_db(report_results, report_type):
-    print(f"Google {report_type} report received, writing to DB...")
+    console.print(f"Google {report_type} report received, writing to DB...")
 
     if report_type == 'accounts':
         write_google_accounts_report(report_results)
@@ -55,11 +58,11 @@ def write_google_report_to_db(report_results, report_type):
         write_google_shopping_ads_report(report_results)
 
     else:
-        print("You need to provide a Google Ads report type like 'accounts', 'campaigns', 'ads' or 'shopping.")
+        console.print("You need to provide a Google Ads report type like 'accounts', 'campaigns', 'ads' or 'shopping.")
 
 
 def write_adobe_report_to_db(report_results, report_type):
-    print(f"Adobe {report_type} report received, writing to DB...")
+    console.print(f"Adobe {report_type} report received, writing to DB...")
 
     if report_type == 'core_metrics':
         write_adobe_core_metrics_report(report_results)
@@ -68,7 +71,7 @@ def write_adobe_report_to_db(report_results, report_type):
         write_adobe_conversion_rate_report(report_results)
 
     else:
-        print("You need to provide an report type like 'revenue' or 'conversion_rate.")
+        console.print("You need to provide an report type like 'revenue' or 'conversion_rate.")
 
 
 def write_adobe_core_metrics_report(report_results):
@@ -79,17 +82,18 @@ def write_adobe_core_metrics_report(report_results):
     for record in report_results:
         report_record = MetricsReportRecord(account_name=clean_country_name(record[1]),
                                             account_region=get_region(record[1]),
-                                            time_period=record[0][0],
-                                            week=get_week_in_quarter(record[0][0]),
-                                            revenue=record[0][2],
-                                            conversion_rate=record[0][3],
-                                            orders=record[0][4])
+                                            time_period=record[0],
+                                            week=get_week_in_quarter(record[0]),
+                                            revenue=record[2],
+                                            conversion_rate=record[3] * 100,
+                                            visits=record[4],
+                                            orders=record[5],
+                                            aov=record[6],
+                                            units=record[7],
+                                            aur=record[8])
 
-        print(report_record)
         # session.add(report_record)
         metrics_report_records_to_insert.append(report_record)
-
-
 
     # Set up DB session
     session = get_session()
@@ -100,7 +104,7 @@ def write_adobe_core_metrics_report(report_results):
     # Close the session
     session.close()
 
-    print("Adobe Records added to DB")
+    console.print("All Adobe Records added to DB")
 
 
 def write_adobe_conversion_rate_report(report_results):
@@ -108,7 +112,7 @@ def write_adobe_conversion_rate_report(report_results):
 
 
 def write_microsoft_report_to_db(report_results, report_type):
-    print(f"Microsoft {report_type} report received, writing to DB...")
+    console.print(f"Microsoft {report_type} report received, writing to DB...")
 
     if report_type == 'accounts':
         write_microsoft_accounts_report(report_results)
@@ -123,7 +127,7 @@ def write_microsoft_report_to_db(report_results, report_type):
         write_microsoft_shopping_ads_report(report_results)
 
     else:
-        print("You need to provide a Microsoft Ads report type like 'accounts', 'campaigns', 'ads' or 'shopping'.")
+        console.print("You need to provide a Microsoft Ads report type like 'accounts', 'campaigns', 'ads' or 'shopping'.")
 
 
 def write_google_accounts_report(report_results):
@@ -132,16 +136,6 @@ def write_google_accounts_report(report_results):
 
     # Create a list to contain tuples from the response that we'll add to the database.
     accounts_report_records_to_insert = []
-
-
-    ##############################################################################################################
-    ##############################################################################################################
-    ##############################################################################################################
-    # Left off here. Dateranges for Adobe are correct and it seems the correct data is now coming back. But the
-    # incorrect data is being written to the DB
-    ##############################################################################################################
-    ##############################################################################################################
-    ##############################################################################################################
 
     # Loop through the returned records and do something with them.
     for record in report_results:
@@ -168,7 +162,7 @@ def write_google_accounts_report(report_results):
     # Close the session
     session.close()
 
-    print("Total time for adding Google accounts to the database was " + str(time.time() - tga)[:-15] + " secs ")
+    console.print("Total time for adding Google accounts to the database was " + str(time.time() - tga)[:-15] + " secs ")
 
 
 def write_google_campaigns_report(report_results):
@@ -206,7 +200,7 @@ def write_google_campaigns_report(report_results):
     # Close the session
     session.close()
 
-    print("Total time for adding Google campaigns to the database was " + str(time.time() - tgc)[:-15] + " secs ")
+    console.print("Total time for adding Google campaigns to the database was " + str(time.time() - tgc)[:-15] + " secs ")
 
 
 def write_google_search_ads_report(report_results):
@@ -214,8 +208,6 @@ def write_google_search_ads_report(report_results):
     ads_report_records_to_insert = []
 
     for record in report_results:
-        # print(record)
-
         # Handle RSA ad types first as SQLAlchemy needs to insert uniform objects..
         # Create a list for each of the RSA asset sets that comes back. Initialize to empty string for uniformity.
         rsa_headline_list = [''] * 15
@@ -301,7 +293,7 @@ def write_google_search_ads_report(report_results):
     # Close the session
     session.close()
 
-    print("Total time for adding Google search ads to the database was " + str(time.time() - tgsa)[:-15] + " secs ")
+    console.print("Total time for adding Google search ads to the database was " + str(time.time() - tgsa)[:-15] + " secs ")
 
 
 def write_google_shopping_ads_report(report_results):
@@ -342,7 +334,7 @@ def write_google_shopping_ads_report(report_results):
     # Close the session
     session.close()
 
-    print("Total time for adding Google shopping ads to the database was " + str(time.time() - tgshop)[:-15] + " secs ")
+    console.print("Total time for adding Google shopping ads to the database was " + str(time.time() - tgshop)[:-15] + " secs ")
 
 
 def write_microsoft_accounts_report(report_results):
@@ -376,7 +368,7 @@ def write_microsoft_accounts_report(report_results):
     # Close the session
     session.close()
 
-    print("Total time for adding Microsoft accounts to the database was " + str(time.time() - tma)[:-15] + " secs ")
+    console.print("Total time for adding Microsoft accounts to the database was " + str(time.time() - tma)[:-15] + " secs ")
 
 
 def write_microsoft_campaigns_report(report_results):
@@ -406,7 +398,7 @@ def write_microsoft_campaigns_report(report_results):
     # Close the session
     session.close()
 
-    print("Total time for adding Microsoft campaigns to the database was " + str(time.time() - tmc)[:-15] + " secs ")
+    console.print("Total time for adding Microsoft campaigns to the database was " + str(time.time() - tmc)[:-15] + " secs ")
 
 
 def write_microsoft_search_ads_report(report_results):
@@ -453,7 +445,7 @@ def write_microsoft_search_ads_report(report_results):
     # Close the session
     session.close()
 
-    print("Total time for adding Microsoft ads to the database was " + str(time.time() - tmsa)[:-15] + " secs ")
+    console.print("Total time for adding Microsoft ads to the database was " + str(time.time() - tmsa)[:-15] + " secs ")
 
 
 def write_microsoft_shopping_ads_report(report_results):
@@ -491,5 +483,5 @@ def write_microsoft_shopping_ads_report(report_results):
     session.commit()
     session.close()
 
-    print("Total time for adding Microsoft shopping ads to the database was " + str(time.time() - tmshop)[
+    console.print("Total time for adding Microsoft shopping ads to the database was " + str(time.time() - tmshop)[
                                                                                 :-15] + " secs ")

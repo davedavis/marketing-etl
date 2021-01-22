@@ -2,37 +2,44 @@
 # is no consistency between account names across platforms, especially Bing.
 
 def clean_country_name(dirty_name):
+    # Normalize as Adobe returns names in different cases.
+    normalized_country_name = dirty_name.casefold().strip()
+
     # North
-    if ' NL' in dirty_name or 'Netherlands' in dirty_name:
+    if normalized_country_name == "nl" or normalized_country_name == "netherlands":
         return 'Netherlands'
-    elif ' DK' in dirty_name or 'Denmark' in dirty_name:
+    elif normalized_country_name == "dk" or normalized_country_name == "denmark":
         return 'Denmark'
-    elif 'SE' in dirty_name or 'Sweden' in dirty_name:
+    elif normalized_country_name == "se" or normalized_country_name == "sweden":
         return 'Sweden'
-    elif ' FI' in dirty_name or 'Finland' in dirty_name:
+    elif normalized_country_name == "fi" or normalized_country_name == "finland":
         return 'Finland'
-    elif ' BE' in dirty_name or 'Belgium' in dirty_name:
+    elif normalized_country_name == "be" or normalized_country_name == "belgium":
         return 'Belgium'
-    elif 'NO' in dirty_name or 'Norway' in dirty_name:
+    elif normalized_country_name == "no" or normalized_country_name == "norway":
         return 'Norway'
+
     # Central
-    elif ' DE' in dirty_name or 'Germany' in dirty_name:
+    elif normalized_country_name == "de" or normalized_country_name == "germany":
         return 'Germany'
-    elif ' AT' in dirty_name or 'Austria' in dirty_name:
+    elif normalized_country_name == "at" or normalized_country_name == "austria":
         return 'Austria'
-    elif ' CH' in dirty_name or 'Switzerland' in dirty_name:
+    elif normalized_country_name == "ch" or normalized_country_name == "switzerland":
         return 'Switzerland'
     # South
-    elif ' FR' in dirty_name or 'France' in dirty_name:
+    elif normalized_country_name == "fr" or normalized_country_name == "france":
         return 'France'
-    elif ' ES' in dirty_name or 'Spain' in dirty_name:
+    elif normalized_country_name == "es" or normalized_country_name == "spain":
         return 'Spain'
-    elif ' IT' in dirty_name or 'Italy' in dirty_name:
+    elif normalized_country_name == "it" or normalized_country_name == "italy":
         return 'Italy'
-    elif ' PT' in dirty_name or 'Portugal' in dirty_name:
+    elif normalized_country_name == "pt" or normalized_country_name == "portugal":
         return 'Portugal'
     # UKI
-    elif ' UK' in dirty_name or 'Kingdom' in dirty_name:
+    elif normalized_country_name == "uk" or normalized_country_name == "gb" or normalized_country_name == "united kingdom":
         return 'UK'
-    elif ' IE' in dirty_name or 'Ireland' in dirty_name:
+    elif normalized_country_name == "ie" or normalized_country_name == "ireland":
         return 'Ireland'
+
+    else:
+        return "Unknown Country"

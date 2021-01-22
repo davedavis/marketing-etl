@@ -60,16 +60,16 @@ def main(quarter):
 
     """
 
-    print('Tracker Running...')
-    print(f"Running for quarter {quarter} ")
+    console.print('Tracker Running...')
+    console.print(f"Running for quarter {quarter} ")
 
     # Truncate and setup database tables with SQLAlchemy
-    print('Truncating database tables...')
+    console.print('Truncating database tables...')
     init_db()
-    print('Tables truncated.')
+    console.print('Tables truncated.')
 
     # Set date range.
-    print('Calculating date range for reports..')
+    console.print('Calculating date range for reports..')
     google_date_range = daterange.get_google_date_range(quarter)
     bing_date_range_start, bing_date_range_end = daterange.get_bing_date_range(quarter)
     adobe_date_range_start, adobe_date_range_end = daterange.get_adobe_date_range(quarter)
@@ -100,7 +100,6 @@ def main(quarter):
     # adobe_report_builder.get_report(adobe_date_range, report_type="conversion_rate")
 
 
-
 # ToDo: Make args a global variable instead of accessing them directly in the model for dynamic table creation.
 if __name__ == "__main__":
     # Set up argparse and support reporting for previous quarter.
@@ -112,4 +111,3 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     main(args.quarter)
-

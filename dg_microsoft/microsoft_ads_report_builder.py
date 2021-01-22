@@ -13,7 +13,8 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-import mysql
+
+
 from suds import WebFault
 
 from dg_db.db_write import write_microsoft_report_to_db
@@ -26,7 +27,10 @@ from dg_microsoft.base_reports.output_helper import output_webfault_errors
 
 from dg_config import settingsfile
 from dg_microsoft.report_types import get_report_type
+from rich.console import Console
 
+# Init fancy console
+console = Console()
 
 # Init settings
 settings = settingsfile.get_settings()
@@ -65,7 +69,7 @@ def build_microsoft_report_object(start_date, end_date, report_type):
 
         # Download the report in memory with ReportingServiceManager.download_report
         # The download_report helper function downloads the report and summarizes results.
-        print(f"Downloading the Microsoft Ads {report_type} report...")
+        console.print(f"Downloading the Microsoft Ads {report_type} report...")
 
         report_container = reporting_service_manager.download_report(report_download_request)
 

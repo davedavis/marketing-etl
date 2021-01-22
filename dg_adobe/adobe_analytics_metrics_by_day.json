@@ -27,15 +27,15 @@
         },
         {
             "type": "segment",
-            "segmentId": "s300001357_5b75470a03d38340b61fd802"
-        },
-        {
-            "type": "segment",
             "segmentId": "s300001357_598d71608f0c6573e0e828d2"
         },
         {
+            "type": "segment",
+            "segmentId": "s300001357_5e8c986b1212e65dbb2fd39e"
+        },
+        {
             "type": "dateRange",
-            "dateRange": "2021-01-04T00:00:00.000/2021-01-05T00:00:00.000"
+            "dateRange": "2021-01-01T00:00:00.000/2021-01-05T00:00:00.000"
         }
     ],
     "metricContainer": {
@@ -56,6 +56,18 @@
             {
                 "columnId": "3",
                 "id": "metrics/orders"
+            },
+            {
+                "columnId": "4",
+                "id": "cm300001357_5cd16b2cd301fa163a021c2f"
+            },
+            {
+                "columnId": "5",
+                "id": "metrics/units"
+            },
+            {
+                "columnId": "6",
+                "id": "cm300001357_599c44734dfc4e79fb8398ee"
             }
         ]
     },

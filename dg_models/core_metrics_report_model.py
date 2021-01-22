@@ -20,7 +20,11 @@ class MetricsReportRecord(Base):
     week = Column(Integer)
     revenue = Column(Float)
     conversion_rate = Column(Float)
+    visits = Column(Float)
     orders = Column(Float)
+    aov = Column(Float)
+    units = Column(Float)
+    aur = Column(Float)
 
     def __repr__(self):
-        return f'Account Report: {self.account_name} Week: {self.week} - Revenue: {self.revenue}'
+        return f'Analytics Report: {self.account_name} Week: {self.week} - Revenue: {self.revenue}'
