@@ -65,6 +65,7 @@ def main(quarter):
 
     # Truncate and setup database tables with SQLAlchemy
     console.print('Truncating database tables...')
+    # ToDo: Truncate individual tables at component/report runtime, not all at once.
     init_db()
     console.print('Tables truncated.')
 
@@ -80,20 +81,20 @@ def main(quarter):
 
     # # Initialize the report retrieval flow. Stagger platforms & sleep for rate limiting.
     # # Start the Accounts report flow for all platforms.
-    # google_ads_report_builder.get_report(google_date_range, report_type="accounts")
-    # microsoft_ads_report_builder.get_report(bing_date_range_start, bing_date_range_end, report_type="accounts")
+    google_ads_report_builder.get_report(google_date_range, report_type="accounts")
+    microsoft_ads_report_builder.get_report(bing_date_range_start, bing_date_range_end, report_type="accounts")
     #
     # # Start the Campaigns report flow for all platforms.
-    # google_ads_report_builder.get_report(google_date_range, report_type="campaigns")
-    # microsoft_ads_report_builder.get_report(bing_date_range_start, bing_date_range_end, report_type="campaigns")
+    google_ads_report_builder.get_report(google_date_range, report_type="campaigns")
+    microsoft_ads_report_builder.get_report(bing_date_range_start, bing_date_range_end, report_type="campaigns")
     #
     # # Start the Search Ads report flow for all platforms.
-    # google_ads_report_builder.get_report(google_date_range, report_type="ads")
-    # microsoft_ads_report_builder.get_report(bing_date_range_start, bing_date_range_end, report_type="ads")
+    google_ads_report_builder.get_report(google_date_range, report_type="ads")
+    microsoft_ads_report_builder.get_report(bing_date_range_start, bing_date_range_end, report_type="ads")
     #
     # # Start the Shopping Ads report flow for all platforms.
-    # google_ads_report_builder.get_report(google_date_range, report_type="shopping")
-    # microsoft_ads_report_builder.get_report(bing_date_range_start, bing_date_range_end, report_type="shopping")
+    google_ads_report_builder.get_report(google_date_range, report_type="shopping")
+    microsoft_ads_report_builder.get_report(bing_date_range_start, bing_date_range_end, report_type="shopping")
 
     # Start the Adobe Revenue report flow.
     adobe_report_builder.get_report(adobe_date_range_start, adobe_date_range_end, report_type="core_metrics")
