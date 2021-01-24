@@ -100,7 +100,7 @@ def main(quarter):
     adobe_report_builder.get_report(adobe_date_range_start, adobe_date_range_end, report_type="core_metrics")
     # adobe_report_builder.get_report(adobe_date_range, report_type="conversion_rate")
 
-
+# ToDo: Change country/region converter into single function.
 # ToDo: Make args a global variable instead of accessing them directly in the model for dynamic table creation.
 if __name__ == "__main__":
     # Set up argparse and support reporting for previous quarter.
