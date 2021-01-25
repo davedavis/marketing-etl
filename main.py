@@ -72,43 +72,63 @@ def main(quarter):
     # Set date range.
     console.print('Calculating date range for reports..')
     google_date_range = daterange.get_google_date_range(quarter)
-    bing_date_range_start, bing_date_range_end = daterange.get_bing_date_range(quarter)
-    adobe_date_range_start, adobe_date_range_end = daterange.get_adobe_date_range(quarter)
+    bing_date_range_start, bing_date_range_end = daterange.get_bing_date_range(
+        quarter)
+    adobe_date_range_start, adobe_date_range_end = daterange.get_adobe_date_range(
+        quarter)
 
     console.print("Google Date Range is: ", google_date_range)
-    console.print("Bing Date Range is: ", bing_date_range_start, bing_date_range_end)
-    console.print("Adobe Date Range is: ", adobe_date_range_start, adobe_date_range_end)
+    console.print("Bing Date Range is: ", bing_date_range_start,
+                  bing_date_range_end)
+    console.print("Adobe Date Range is: ", adobe_date_range_start,
+                  adobe_date_range_end)
 
     # # Initialize the report retrieval flow. Stagger platforms & sleep for rate limiting.
     # # Start the Accounts report flow for all platforms.
-    google_ads_report_builder.get_report(google_date_range, report_type="accounts")
-    microsoft_ads_report_builder.get_report(bing_date_range_start, bing_date_range_end, report_type="accounts")
+    google_ads_report_builder.get_report(google_date_range,
+                                         report_type="accounts")
+    microsoft_ads_report_builder.get_report(bing_date_range_start,
+                                            bing_date_range_end,
+                                            report_type="accounts")
     #
     # # Start the Campaigns report flow for all platforms.
-    google_ads_report_builder.get_report(google_date_range, report_type="campaigns")
-    microsoft_ads_report_builder.get_report(bing_date_range_start, bing_date_range_end, report_type="campaigns")
+    google_ads_report_builder.get_report(google_date_range,
+                                         report_type="campaigns")
+    microsoft_ads_report_builder.get_report(bing_date_range_start,
+                                            bing_date_range_end,
+                                            report_type="campaigns")
     #
     # # Start the Search Ads report flow for all platforms.
     google_ads_report_builder.get_report(google_date_range, report_type="ads")
-    microsoft_ads_report_builder.get_report(bing_date_range_start, bing_date_range_end, report_type="ads")
+    microsoft_ads_report_builder.get_report(bing_date_range_start,
+                                            bing_date_range_end,
+                                            report_type="ads")
     #
     # # Start the Shopping Ads report flow for all platforms.
-    google_ads_report_builder.get_report(google_date_range, report_type="shopping")
-    microsoft_ads_report_builder.get_report(bing_date_range_start, bing_date_range_end, report_type="shopping")
+    google_ads_report_builder.get_report(google_date_range,
+                                         report_type="shopping")
+    microsoft_ads_report_builder.get_report(bing_date_range_start,
+                                            bing_date_range_end,
+                                            report_type="shopping")
 
     # Start the Adobe Revenue report flow.
-    adobe_report_builder.get_report(adobe_date_range_start, adobe_date_range_end, report_type="core_metrics")
+    adobe_report_builder.get_report(adobe_date_range_start,
+                                    adobe_date_range_end,
+                                    report_type="core_metrics")
     # adobe_report_builder.get_report(adobe_date_range, report_type="conversion_rate")
+
 
 # ToDo: Change country/region converter into single function.
 # ToDo: Make args a global variable instead of accessing them directly in the model for dynamic table creation.
 if __name__ == "__main__":
     # Set up argparse and support reporting for previous quarter.
-    parser = argparse.ArgumentParser(description="Updates or backfills database with SEM platform reporting.")
+    parser = argparse.ArgumentParser(
+        description="Updates/backfills database with SEM platform reporting.")
     parser.add_argument("-q", "--quarter",
                         type=int,
                         default=fiscalyear.FiscalQuarter.current().quarter,
-                        help="The quarter as an integer. 1, 2, 3 or 4 which will be for the current fiscal year.")
+                        help="The quarter as an integer. 1, 2, 3 or 4 which "
+                             "will be for the current fiscal year.")
     args = parser.parse_args()
 
     main(args.quarter)
