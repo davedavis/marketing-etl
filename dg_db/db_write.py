@@ -29,6 +29,8 @@ from dg_models.ads_report_model import AdReportRecord
 from dg_config import settingsfile
 from rich.console import Console
 
+from dg_models.skew_model import SkewRecord
+
 console = Console()
 
 # Import helper functions
@@ -72,6 +74,50 @@ def write_adobe_report_to_db(report_results, report_type):
 
     else:
         console.print("You need to provide an report type like 'revenue' or 'conversion_rate.")
+
+
+def write_skews(report_results):
+    metrics_report_records_to_insert = []
+
+    # Loop through the returned records and do something with them.
+    for record in report_results:
+        report_record = SkewRecord(
+                                    country=clean_country_name(record[0]),
+                                    net_media_spend=record[1],
+                                    alliance_media_spend=record[2],
+                                    er_target=record[3],
+                                    w1_skew=record[4],
+                                    w2_skew=record[5],
+                                    w3_skew=record[6],
+                                    w4_skew=record[7],
+                                    w5_skew=record[8],
+                                    w6_skew=record[9],
+                                    w7_skew=record[10],
+                                    w8_skew=record[11],
+                                    w9_skew=record[12],
+                                    w10_skew=record[13],
+                                    w11_skew=record[14],
+                                    w12_skew=record[15],
+                                    w13_skew=record[16],
+                                    w14_skew=record[17]
+                                   )
+
+        # session.add(report_record)
+        metrics_report_records_to_insert.append(report_record)
+
+    # Set up DB session
+    session = get_session()
+    # Bulk save the records from the list
+    session.bulk_save_objects(metrics_report_records_to_insert)
+    # Commit the session
+    session.commit()
+    # Close the session
+    session.close()
+
+    console.print("All Skews added to DB")
+
+
+
 
 
 def write_adobe_core_metrics_report(report_results):
