@@ -14,8 +14,8 @@ class SkewRecord(Base):
 
     skew_id = Column(Integer, primary_key=True)
     country = Column(String(length=64))
-    net_media_spend = Column(Float)
-    alliance_media_spend = Column(Float)
+    media_spend = Column(Float)
+    revenue_target = Column(Float)
     er_target = Column(Float)
     w1_skew = Column(Numeric)
     w2_skew = Column(Numeric)

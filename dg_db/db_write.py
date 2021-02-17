@@ -69,8 +69,8 @@ def write_adobe_report_to_db(report_results, report_type):
     if report_type == 'core_metrics':
         write_adobe_core_metrics_report(report_results)
 
-    elif report_type == 'conversion_rate':
-        write_adobe_conversion_rate_report(report_results)
+    elif report_type == 'emea_metrics':
+        write_adobe_emea_metrics_report(report_results)
 
     else:
         console.print("You need to provide an report type like 'revenue' or 'conversion_rate.")
@@ -153,8 +153,41 @@ def write_adobe_core_metrics_report(report_results):
     console.print("All Adobe Records added to DB")
 
 
-def write_adobe_conversion_rate_report(report_results):
-    pass
+def write_adobe_emea_metrics_report(report_results):
+    # Create a list to contain tuples from the response that we'll add to the database.
+    metrics_report_records_to_insert = []
+
+    # Loop through the returned records and do something with them.
+    for record in report_results:
+
+        ## Convert the string date returned to a datetime object
+        record_date = datetime.strptime(record[1], '%b %d, %Y')
+
+        report_record = MetricsReportRecord(account_name=clean_country_name(record[0]),
+                                            account_region=get_region(record[0]),
+                                            time_period=record_date.date(),
+                                            week=get_week_in_quarter(record_date),
+                                            revenue=record[2],
+                                            conversion_rate=record[3] * 100,
+                                            visits=record[4],
+                                            orders=record[5],
+                                            aov=record[6],
+                                            units=record[7],
+                                            aur=record[8])
+
+        # session.add(report_record)
+        metrics_report_records_to_insert.append(report_record)
+
+    # Set up DB session
+    session = get_session()
+    # Bulk save the records from the list
+    session.bulk_save_objects(metrics_report_records_to_insert)
+    # Commit the session
+    session.commit()
+    # Close the session
+    session.close()
+
+    console.print("All Adobe Records added to DB")
 
 
 def write_microsoft_report_to_db(report_results, report_type):

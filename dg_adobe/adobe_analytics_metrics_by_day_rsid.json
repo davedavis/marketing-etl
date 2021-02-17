@@ -1,0 +1,92 @@
+{
+    "rsid": "lenovodepub",
+    "globalFilters": [
+        {
+            "type": "segment",
+            "segmentDefinition": {
+                "container": {
+                    "func": "container",
+                    "context": "hits",
+                    "pred": {
+                        "func": "streq",
+                        "str": "SEM",
+                        "val": {
+                            "func": "attr",
+                            "name": "variables/campaign.6"
+                        },
+                        "description": "Program"
+                    }
+                },
+                "func": "segment",
+                "version": [
+                    1,
+                    0,
+                    0
+                ]
+            }
+        },
+        {
+            "type": "segment",
+            "segmentId": "s300001357_598d71608f0c6573e0e828d2"
+        },
+        {
+            "type": "segment",
+            "segmentId": "s300001357_5b75470a03d38340b61fd802"
+        },
+        {
+            "type": "segment",
+            "segmentId": "s300001357_5e78836c7d03f650c2f46abd"
+        },
+        {
+            "type": "dateRange",
+            "dateRange": "2021-01-01T00:00:00.000/2021-02-17T00:00:00.000",
+            "dateRange": "2021-01-01 00:00:00.000/2021-02-16 23:25:12.919"
+        }
+    ],
+    "metricContainer": {
+        "metrics": [
+            {
+                "columnId": "0",
+                "id": "metrics/revenue"
+            },
+            {
+                "columnId": "1",
+                "id": "cm_visits_orders_defaultmetric"
+            },
+            {
+                "columnId": "2",
+                "id": "cm300001357_5922ee709b1d235724466406"
+            },
+            {
+                "columnId": "3",
+                "id": "metrics/orders"
+            },
+            {
+                "columnId": "4",
+                "id": "cm300001357_5cd16b2cd301fa163a021c2f"
+            },
+            {
+                "columnId": "5",
+                "id": "metrics/units"
+            },
+            {
+                "columnId": "6",
+                "id": "cm300001357_599c44734dfc4e79fb8398ee"
+            }
+        ]
+    },
+    "dimension": "variables/daterangeday",
+    "settings": {
+        "countRepeatInstances": true,
+        "limit": 400,
+        "page": 0,
+        "dimensionSort": "asc",
+        "nonesBehavior": "return-nones"
+    },
+    "statistics": {
+        "functions": [
+            "col-max",
+            "col-min"
+        ]
+    }
+}

@@ -75,54 +75,40 @@ def main(quarter):
     # Set date range.
     console.print('Calculating date range for reports..')
     google_date_range = daterange.get_google_date_range(quarter)
-    bing_date_range_start, bing_date_range_end = daterange.get_bing_date_range(
-        quarter)
-    adobe_date_range_start, adobe_date_range_end = daterange.get_adobe_date_range(
-        quarter)
+    bing_date_range_start, bing_date_range_end = daterange.get_bing_date_range(quarter)
+    # adobe_date_range_start, adobe_date_range_end = daterange.get_adobe_date_range(quarter)
+    adobe_full_date_range = daterange.get_full_adobe_date_range(quarter)
 
     console.print("Google Date Range is: ", google_date_range)
-    console.print("Bing Date Range is: ", bing_date_range_start,
-                  bing_date_range_end)
-    console.print("Adobe Date Range is: ", adobe_date_range_start,
-                  adobe_date_range_end)
+    console.print("Bing Date Range is: ", bing_date_range_start, bing_date_range_end)
+    # console.print("Adobe Date Range is: ", adobe_date_range_start, adobe_date_range_end)
+    console.print("Adobe Date Range is: ", adobe_full_date_range)
 
     # Get the Skews
     get_skews(quarter)
 
     # Initialize the report retrieval flow. Stagger & sleep for rate limiting.
     # Start the Accounts report flow for all platforms.
-    google_ads_report_builder.get_report(google_date_range,
-                                         report_type="accounts")
-    microsoft_ads_report_builder.get_report(bing_date_range_start,
-                                            bing_date_range_end,
-                                            report_type="accounts")
+    google_ads_report_builder.get_report(google_date_range, report_type="accounts")
+    microsoft_ads_report_builder.get_report(bing_date_range_start, bing_date_range_end, report_type="accounts")
 
     # # Start the Campaigns report flow for all platforms.
-    google_ads_report_builder.get_report(google_date_range,
-                                         report_type="campaigns")
-    microsoft_ads_report_builder.get_report(bing_date_range_start,
-                                            bing_date_range_end,
-                                            report_type="campaigns")
+    google_ads_report_builder.get_report(google_date_range, report_type="campaigns")
+    microsoft_ads_report_builder.get_report(bing_date_range_start, bing_date_range_end, report_type="campaigns")
 
-    sleep(300)
+
 
     # # Start the Search Ads report flow for all platforms.
     google_ads_report_builder.get_report(google_date_range, report_type="ads")
-    microsoft_ads_report_builder.get_report(bing_date_range_start,
-                                            bing_date_range_end,
-                                            report_type="ads")
+    microsoft_ads_report_builder.get_report(bing_date_range_start, bing_date_range_end, report_type="ads")
 
     # # Start the Shopping Ads report flow for all platforms.
-    google_ads_report_builder.get_report(google_date_range,
-                                         report_type="shopping")
-    microsoft_ads_report_builder.get_report(bing_date_range_start,
-                                            bing_date_range_end,
-                                            report_type="shopping")
+    google_ads_report_builder.get_report(google_date_range, report_type="shopping")
+    microsoft_ads_report_builder.get_report(bing_date_range_start, bing_date_range_end, report_type="shopping")
 
+    # ToDo: Clean up old Adobe implementation
     # Start the Adobe Revenue report flow.
-    adobe_report_builder.get_report(adobe_date_range_start,
-                                    adobe_date_range_end,
-                                    report_type="core_metrics")
+    adobe_report_builder.get_report(adobe_full_date_range, report_type="emea_metrics")
 
 
 # ToDo: Change country/region converter into single function. ToDo: Make args

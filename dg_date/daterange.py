@@ -131,6 +131,39 @@ def get_adobe_date_range(quarter):
     return adobe_formatted_date_range
 
 
+def get_full_adobe_date_range(quarter):
+    adobe_start_date = ""
+    adobe_end_date = ""
+
+    if quarter == 1:
+        adobe_start_date = company_fiscal_year.q1.start
+        adobe_end_date = company_fiscal_year.q1.end
+    elif quarter == 2:
+        adobe_start_date = company_fiscal_year.q2.start
+        adobe_end_date = company_fiscal_year.q2.end
+    elif quarter == 3:
+        adobe_start_date = company_fiscal_year.q3.start
+        adobe_end_date = company_fiscal_year.q3.end
+    elif quarter == 4:
+        adobe_start_date = company_fiscal_year.q4.start
+        adobe_end_date = company_fiscal_year.q4.end
+    else:
+        print("You didn't pass in a valid quarter number. Options are 1, 2, 3 or 4")
+
+    # If the requested quarter is this quarter, set the end date to today, and not the end of the quarter as Microsoft
+    # Ads doesn't support using future dates (and ignoring them) in the API like Google does.
+    if fiscalyear.FiscalQuarter.current().quarter == quarter:
+        adobe_end_date = datetime.datetime.now()
+
+        # ToDo: For debugging. Remove when stable.
+        # adobe_end_date = adobe_start_date + datetime.timedelta(3)
+
+    joined_ranges = str(adobe_start_date) + ".000/" + str(adobe_end_date)[:-3]
+    # Add in the Ts
+    adobe_formatted_date_range = "T".join(joined_ranges.split())
+    return adobe_formatted_date_range
+
+
 def get_bing_date_range(quarter):
     bing_start_date = ""
     bing_end_date = ""

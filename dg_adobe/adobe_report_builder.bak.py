@@ -34,19 +34,27 @@ console = Console()
 settings = settingsfile.get_settings()
 
 
-def get_report(adobe_full_date_range, report_type):
+def get_report(date_range_start, date_range_end, report_type):
     # Authenticate
     access_token, global_company_id = adobe_analytics_auth()
 
-    # List of RSIDs to loop through.
-    rsids = settings["rsids"]
+    # Adobe has weird report date range requirements with odd formatting. It
+    # also doesn't allow the day dimension to be labeled, so it's easier to
+    # just call the report for each day in the date range rather than get the
+    # entire date range with an unlabeled date day dimension (positional in a
+    # list) So... Split out the daterange into separate days and add them to
+    # a list.
+    day_list = pd.date_range(date_range_start, date_range_end - datetime.timedelta(days=1), freq='d')
 
     # Container for returned records.
     records_to_insert = []
 
-    for rsid in rsids:
+    for day in day_list:
+        end_of_day = day + datetime.timedelta(hours=24)
+        report_date = day.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3] + "/" + end_of_day.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3]
+
         # Get the report type and query string.
-        query = get_report_type(report_type, adobe_full_date_range, rsid)
+        query = get_report_type(report_type, report_date)
 
         # Get the report data
         adobe_report_response = requests.post("{}/{}/reports".format(settings["analytics_api_url"], global_company_id),
@@ -66,18 +74,17 @@ def get_report(adobe_full_date_range, report_type):
             if response_dict["rows"]:
                 # Loop through the Adobe record and pluck out what we need into a cleaned record list.
                 for record in response_dict["rows"]:
-                    cleaned_record = [rsid, record["value"],
-                                      record["data"][0], record["data"][1],
-                                      record["data"][2], record["data"][3],
-                                      record["data"][4], record["data"][5],
-                                      record["data"][6]]
 
-                    if cleaned_record[3] == "NaN":
-                        cleaned_record[3] = 0
+
+                    cleaned_record = [day.to_pydatetime(), record["value"], record["data"][0],
+                                      record["data"][1], record["data"][2], record["data"][3],
+                                      record["data"][4], record["data"][5], record["data"][6]]
+
                     if cleaned_record[6] == "NaN":
                         cleaned_record[6] = 0
                     if cleaned_record[8] == "NaN":
                         cleaned_record[8] = 0
+
 
                     # Finally, add the cleaned record list to the list we want to pass to the DB write module.
                     records_to_insert.append(cleaned_record)
@@ -89,5 +96,4 @@ def get_report(adobe_full_date_range, report_type):
         console.print(records_to_insert)
 
     # Send the list off to be written.
-    # ToDo: Reset this
     write_adobe_report_to_db(records_to_insert, report_type)
