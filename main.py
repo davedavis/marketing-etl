@@ -36,7 +36,7 @@ from time import sleep
 
 import dg_utils.timing
 
-# This module is required for custom quarter and weeks based on company fiscal year.
+# This module is required for custom qtr & weeks based on company fiscal year.
 import fiscalyear
 import argparse
 

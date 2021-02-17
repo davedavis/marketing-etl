@@ -82,9 +82,9 @@ def write_skews(report_results):
     # Loop through the returned records and do something with them.
     for record in report_results:
         report_record = SkewRecord(
-                                    country=clean_country_name(record[0]),
-                                    net_media_spend=record[1],
-                                    alliance_media_spend=record[2],
+                                    account_name=clean_country_name(record[0]),
+                                    spend_target=record[1],
+                                    revenue_target=record[2],
                                     er_target=record[3],
                                     w1_skew=record[4],
                                     w2_skew=record[5],
