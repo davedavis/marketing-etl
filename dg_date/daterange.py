@@ -22,16 +22,9 @@ current_quarter = fiscalyear.FiscalQuarter.current()
 last_quarter = fiscalyear.FiscalQuarter.prev_quarter
 
 # Last Quarter Settings
-# ToDo: Delete comments
 company_fiscal_year = fiscalyear.FiscalYear(2020)
 last_quarter_start_date = fiscalyear.FiscalQuarter.current().prev_quarter.start.strftime('%Y-%m-%d')
 last_quarter_end_date = fiscalyear.FiscalQuarter.current().prev_quarter.end.strftime('%Y-%m-%d')
-
-# last_quarter_start_date = company_fiscal_year.q3.start.strftime('%Y-%m-%d')
-# last_quarter_end_date = company_fiscal_year.q3.end.strftime('%Y-%m-%d')
-
-# bing_last_quarter_start = company_fiscal_year.q3.start
-# bing_last_quarter_end = company_fiscal_year.q3.end
 
 bing_last_quarter_start = fiscalyear.FiscalQuarter.current().prev_quarter.start
 bing_last_quarter_end = fiscalyear.FiscalQuarter.current().prev_quarter.end
@@ -152,11 +145,10 @@ def get_full_adobe_date_range(quarter):
 
     # If the requested quarter is this quarter, set the end date to today, and not the end of the quarter as Microsoft
     # Ads doesn't support using future dates (and ignoring them) in the API like Google does.
+
+    # ToDo: After Backfill
     if fiscalyear.FiscalQuarter.current().quarter == quarter:
         adobe_end_date = datetime.datetime.now()
-
-        # ToDo: For debugging. Remove when stable.
-        # adobe_end_date = adobe_start_date + datetime.timedelta(3)
 
     joined_ranges = str(adobe_start_date) + ".000/" + str(adobe_end_date)[:-3]
     # Add in the Ts
@@ -185,6 +177,7 @@ def get_bing_date_range(quarter):
 
     # If the requested quarter is this quarter, set the end date to today, and not the end of the quarter as Microsoft
     # Ads doesn't support using future dates (and ignoring them) in the API like Google does.
+    # ToDo: After Backfill
     if fiscalyear.FiscalQuarter.current().quarter == quarter:
         bing_end_date = datetime.datetime.now()
 
