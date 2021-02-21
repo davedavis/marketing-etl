@@ -12,7 +12,7 @@ settings = settingsfile.get_settings()
 
 class Account(Base):
     # Set the table name based on the program arguments.
-    __tablename__ = 'Accounts'
+    __tablename__ = 'Account'
     __tableargs__ = {'schema': settings['db_database']}
 
     id = Column(Integer, primary_key=True)
@@ -20,7 +20,6 @@ class Account(Base):
     account_country_code = Column(String(length=8))
     account_region = Column(String(length=16))
     account_subregion = Column(String(length=8))
-    skews = relationship("Skew", backref="Accounts")
 
     def __repr__(self):
         return f'Account: {self.account_name} Region: {self.account_region}'

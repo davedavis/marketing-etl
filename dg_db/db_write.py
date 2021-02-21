@@ -30,12 +30,13 @@ from dg_models.ads_report_model import AdReportRecord
 from dg_config import settingsfile
 from rich.console import Console
 
+from dg_models.platform_model import Platform
 from dg_models.skew_model import Skew
 
 console = Console()
 
 # Import helper functions
-from dg_models.core_metrics_report_model import MetricsReportRecord
+from dg_models.analytics_model import MetricsReportRecord
 from dg_utils.clean_country import clean_country_name
 from dg_utils.get_quarter_week import get_week_in_quarter
 
@@ -43,6 +44,34 @@ from dg_utils.get_quarter_week import get_week_in_quarter
 from dg_utils.region_converter import get_region
 
 settings = settingsfile.get_settings()
+
+# ToDo: Extract FK extraction to separate method.
+# Get the foreign Keys for all Accounts as we can't insert with a query on a foreign key using
+# SQLAlchemy bulk insert.
+account_fk_dict = {}
+google_platform_fk_dict = {}
+microsoft_platform_fk_dict = {}
+session = get_session()
+accounts = session.query(Account.id, Account.account_name).all()
+
+
+google_platforms = session.query(Platform.id, Platform.account).filter_by(platform="Google").all()
+# Platform ID, given the account ID
+
+
+microsoft_platforms = session.query(Platform.id, Platform.account).filter_by(platform="Microsoft").all()
+
+for account in accounts:
+    account_fk_dict.update({account.account_name: account.id})
+
+for platform in google_platforms:
+    google_platform_fk_dict.update({platform.account: platform.id})
+
+
+for platform in microsoft_platforms:
+    microsoft_platform_fk_dict.update({platform.account: platform.id})
+
+session.close()
 
 
 def write_google_report_to_db(report_results, report_type):
@@ -77,26 +106,51 @@ def write_adobe_report_to_db(report_results, report_type):
         console.print("You need to provide an report type like 'revenue' or 'conversion_rate.")
 
 
+def write_platforms(platforms):
+    platforms_to_insert = []
+
+    # Loop through the returned records and do something with them.
+    for record in platforms:
+        platform = Platform(
+            account=record[0],
+            platform=record[1],
+            account_number=record[2],
+        )
+
+        platforms_to_insert.append(platform)
+
+    # Set up DB session
+    session = get_session()
+    # Bulk save the records from the list
+    session.bulk_save_objects(platforms_to_insert)
+    # Commit the session
+    session.commit()
+    # Close the session
+    session.close()
+
+    console.print("All Platforms added to DB")
+
+
 def write_skews(skews):
     skews_to_insert = []
 
-
     # Loop through the returned records and do something with them.
     for record in skews:
+        # To get the foreign key, we need to open and close a session.
+        # ToDo: Query once and store all account IDs in a dict.
         session = get_session()
         country_fk = session.query(Account.id).filter_by(account_country_code=record[0]).first().id
         session.close()
 
-
         skew = Skew(
-                    account=country_fk,
-                    quarter=record[1],
-                    week=record[2],
-                    spend_target=record[3],
-                    revenue_target=record[4],
-                    er_target=record[5],
+            account=country_fk,
+            quarter=record[1],
+            week=record[2],
+            spend_target=record[3],
+            revenue_target=record[4],
+            er_target=record[5],
 
-                   )
+        )
 
         skews_to_insert.append(skew)
 
@@ -138,10 +192,6 @@ def write_countries(countries):
     console.print("All Countries added to DB")
 
 
-
-
-
-
 def write_adobe_core_metrics_report(report_results):
     # Create a list to contain tuples from the response that we'll add to the database.
     metrics_report_records_to_insert = []
@@ -181,13 +231,11 @@ def write_adobe_emea_metrics_report(report_results):
 
     # Loop through the returned records and do something with them.
     for record in report_results:
-
         ## Convert the string date returned to a datetime object
         record_date = datetime.strptime(record[1], '%b %d, %Y')
 
-        report_record = MetricsReportRecord(account_name=clean_country_name(record[0]),
-                                            account_region=get_region(record[0]),
-                                            time_period=record_date.date(),
+        report_record = MetricsReportRecord(account=account_fk_dict.get(clean_country_name(record[0])),
+                                            date=record_date.date(),
                                             week=get_week_in_quarter(record_date),
                                             revenue=record[2],
                                             conversion_rate=record[3] * 100,
@@ -228,7 +276,8 @@ def write_microsoft_report_to_db(report_results, report_type):
         write_microsoft_shopping_ads_report(report_results)
 
     else:
-        console.print("You need to provide a Microsoft Ads report type like 'accounts', 'campaigns', 'ads' or 'shopping'.")
+        console.print(
+            "You need to provide a Microsoft Ads report type like 'accounts', 'campaigns', 'ads' or 'shopping'.")
 
 
 def write_google_accounts_report(report_results):
@@ -240,16 +289,15 @@ def write_google_accounts_report(report_results):
 
     # Loop through the returned records and do something with them.
     for record in report_results:
-        report_record = AccountReportRecord(platform="Google",
-                                            account_name=clean_country_name(record.customer.descriptive_name),
-                                            account_region=get_region(record.customer.descriptive_name),
-                                            account_number=record.customer.resource_name.split("/")[1],
-                                            time_period=record.segments.date,
-                                            week=get_week_in_quarter(
-                                                datetime.strptime(record.segments.date, "%Y-%m-%d")),
-                                            impressions=record.metrics.impressions,
-                                            clicks=record.metrics.clicks,
-                                            spend=record.metrics.cost_micros / 1000000)
+        report_record = AccountReportRecord(
+            account=account_fk_dict.get(clean_country_name(record.customer.descriptive_name)),
+            platform=google_platform_fk_dict.get(account_fk_dict.get(clean_country_name(record.customer.descriptive_name))),
+            date=record.segments.date,
+            week=get_week_in_quarter(
+                datetime.strptime(record.segments.date, "%Y-%m-%d")),
+            impressions=record.metrics.impressions,
+            clicks=record.metrics.clicks,
+            spend=record.metrics.cost_micros / 1000000)
 
         # session.add(report_record)
         accounts_report_records_to_insert.append(report_record)
@@ -263,7 +311,8 @@ def write_google_accounts_report(report_results):
     # Close the session
     session.close()
 
-    console.print("Total time for adding Google accounts to the database was " + str(time.time() - tga)[:-15] + " secs ")
+    console.print(
+        "Total time for adding Google accounts to the database was " + str(time.time() - tga)[:-15] + " secs ")
 
 
 def write_google_campaigns_report(report_results):
@@ -301,7 +350,8 @@ def write_google_campaigns_report(report_results):
     # Close the session
     session.close()
 
-    console.print("Total time for adding Google campaigns to the database was " + str(time.time() - tgc)[:-15] + " secs ")
+    console.print(
+        "Total time for adding Google campaigns to the database was " + str(time.time() - tgc)[:-15] + " secs ")
 
 
 def write_google_search_ads_report(report_results):
@@ -394,7 +444,8 @@ def write_google_search_ads_report(report_results):
     # Close the session
     session.close()
 
-    console.print("Total time for adding Google search ads to the database was " + str(time.time() - tgsa)[:-15] + " secs ")
+    console.print(
+        "Total time for adding Google search ads to the database was " + str(time.time() - tgsa)[:-15] + " secs ")
 
 
 def write_google_shopping_ads_report(report_results):
@@ -435,7 +486,8 @@ def write_google_shopping_ads_report(report_results):
     # Close the session
     session.close()
 
-    console.print("Total time for adding Google shopping ads to the database was " + str(time.time() - tgshop)[:-15] + " secs ")
+    console.print(
+        "Total time for adding Google shopping ads to the database was " + str(time.time() - tgshop)[:-15] + " secs ")
 
 
 def write_microsoft_accounts_report(report_results):
@@ -446,18 +498,14 @@ def write_microsoft_accounts_report(report_results):
 
     # Loop through the returned records and do something with them.
     for record in report_results:
-        report_record = AccountReportRecord(platform='Microsoft',
-                                            account_name=clean_country_name(record.value('AccountName')),
-                                            account_region=get_region(record.value('AccountName')),
-                                            account_number=record.value('AccountNumber'),
-                                            time_period=record.value('TimePeriod'),
-                                            week=get_week_in_quarter(
-                                                datetime.strptime(record.value('TimePeriod'), '%Y-%m-%d')),
+        report_record = AccountReportRecord(account=account_fk_dict.get(clean_country_name(record.value('AccountName'))),
+                                            platform=google_platform_fk_dict.get(account_fk_dict.get(clean_country_name(record.value('AccountName')))),
+                                            date=record.value('TimePeriod'),
+                                            week=get_week_in_quarter(datetime.strptime(record.value('TimePeriod'), '%Y-%m-%d')),
                                             impressions=record.value('Impressions'),
                                             clicks=record.value('Clicks'),
                                             spend=record.value('Spend'))
 
-        # session.add(report_record)
         accounts_report_records_to_insert.append(report_record)
 
     # Set up DB session
@@ -469,7 +517,8 @@ def write_microsoft_accounts_report(report_results):
     # Close the session
     session.close()
 
-    console.print("Total time for adding Microsoft accounts to the database was " + str(time.time() - tma)[:-15] + " secs ")
+    console.print(
+        "Total time for adding Microsoft accounts to the database was " + str(time.time() - tma)[:-15] + " secs ")
 
 
 def write_microsoft_campaigns_report(report_results):
@@ -499,7 +548,8 @@ def write_microsoft_campaigns_report(report_results):
     # Close the session
     session.close()
 
-    console.print("Total time for adding Microsoft campaigns to the database was " + str(time.time() - tmc)[:-15] + " secs ")
+    console.print(
+        "Total time for adding Microsoft campaigns to the database was " + str(time.time() - tmc)[:-15] + " secs ")
 
 
 def write_microsoft_search_ads_report(report_results):
@@ -585,4 +635,4 @@ def write_microsoft_shopping_ads_report(report_results):
     session.close()
 
     console.print("Total time for adding Microsoft shopping ads to the database was " + str(time.time() - tmshop)[
-                                                                                :-15] + " secs ")
+                                                                                        :-15] + " secs ")

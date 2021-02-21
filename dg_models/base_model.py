@@ -8,9 +8,9 @@ settings = settingsfile.get_settings()
 
 # Init the global base
 Base = declarative_base()
-engine = create_engine(settings['db_connection_string'], echo=True)
+# engine = create_engine(settings['db_connection_string'], echo=True)
 
-# engine = create_engine(settings['db_connection_string'])
+engine = create_engine(settings['db_connection_string'])
 
 Base.metadata.bind = engine
 
