@@ -1,36 +1,29 @@
 import sys
 
-from sqlalchemy import Column, Integer, String, Date, Float, Numeric
+from sqlalchemy import Column, Integer, String, Date, Float, Numeric, ForeignKey
+from sqlalchemy.orm import relationship
+
 from dg_config import settingsfile
 from dg_models.base_model import Base
+from dg_models.account_model import Account
 
 settings = settingsfile.get_settings()
 
 
-class SkewRecord(Base):
+class Skew(Base):
     # Set the table name based on the program arguments.
-    __tablename__ = 'Q'+sys.argv[2]+'_skews'
+    __tablename__ = 'Skews'
     __tableargs__ = {'schema': settings['db_database']}
 
-    skew_id = Column(Integer, primary_key=True)
-    account_name = Column(String(length=64))
+    id = Column(Integer, primary_key=True)
+    account = Column(Integer, ForeignKey('Accounts.id'))
+    account_name = relationship("Account", back_populates="skews")
+    quarter = Column(Integer)
+    week = Column(Integer)
     spend_target = Column(Float)
     revenue_target = Column(Float)
     er_target = Column(Float)
-    w1_skew = Column(Float)
-    w2_skew = Column(Float)
-    w3_skew = Column(Float)
-    w4_skew = Column(Float)
-    w5_skew = Column(Float)
-    w6_skew = Column(Float)
-    w7_skew = Column(Float)
-    w8_skew = Column(Float)
-    w9_skew = Column(Float)
-    w10_skew = Column(Float)
-    w11_skew = Column(Float)
-    w12_skew = Column(Float)
-    w13_skew = Column(Float)
-    w14_skew = Column(Float)
+
 
     def __repr__(self):
-        return f'SKEWS: {self.account_name}'
+        return f'SKEW: {self.id}'

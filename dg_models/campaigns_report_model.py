@@ -9,7 +9,7 @@ settings = settingsfile.get_settings()
 
 class CampaignReportRecord(Base):
     # Set the table name based on the program arguments.
-    __tablename__ = 'Q'+sys.argv[2]+'_campaignsReport'
+    __tablename__ = 'CampaignsReport'
     __tableargs__ = {'schema': settings['db_database']}
 
     report_id = Column(Integer, primary_key=True)

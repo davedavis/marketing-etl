@@ -1,6 +1,6 @@
 import sys
 
-from sqlalchemy import Column, Integer, String, Date, Float
+from sqlalchemy import Column, Integer, String, Date, Float, ForeignKey
 from dg_config import settingsfile
 from dg_models.base_model import Base
 import argparse
@@ -10,11 +10,12 @@ settings = settingsfile.get_settings()
 
 class AccountReportRecord(Base):
     # Set the table name based on the program arguments.
-    __tablename__ = 'Q'+sys.argv[2]+'_accountsReport'
+    __tablename__ = 'AccountsReport'
     __tableargs__ = {'schema': settings['db_database']}
 
     report_id = Column(Integer, primary_key=True)
     platform = Column(String(length=64))
+    # account = Column(Integer, ForeignKey('Accounts.id'))
     account_name = Column(String(length=64))
     account_region = Column(String(length=64))
     account_number = Column(String(length=64))

@@ -10,7 +10,7 @@ settings = settingsfile.get_settings()
 
 class MetricsReportRecord(Base):
     # Set the table name based on the program arguments.
-    __tablename__ = 'Q' + sys.argv[2] + '_analyticsReport'
+    __tablename__ = 'AnalyticsReport'
     __tableargs__ = {'schema': settings['db_database']}
 
     report_id = Column(Integer, primary_key=True)

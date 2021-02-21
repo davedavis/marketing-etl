@@ -21,3 +21,7 @@ def get_session():
     new_session = Session()
     return new_session
 
+
+
+
+

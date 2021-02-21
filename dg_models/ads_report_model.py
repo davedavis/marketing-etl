@@ -9,7 +9,7 @@ settings = settingsfile.get_settings()
 
 class AdReportRecord(Base):
     # Set the table name based on the program arguments.
-    __tablename__ = 'Q'+sys.argv[2]+'_adsReport'
+    __tablename__ = 'AdsReport'
     __tableargs__ = {'schema': settings['db_database']}
 
     report_id = Column(Integer, primary_key=True)

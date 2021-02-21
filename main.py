@@ -1,34 +1,9 @@
 #  #!/usr/bin python
 
-#  Copyright (c) 2020.  Dave Davis
-#  #
-#  Licensed under the Apache License, Version 2.0 (the "License");
-#  you may not use this file except in compliance with the License.
-#  You may obtain a copy of the License at
-#
-#      https://www.apache.org/licenses/LICENSE-2.0
-#
-#  Unless required by applicable law or agreed to in writing, software
-#  distributed under the License is distributed on an "AS IS" BASIS,
-#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#  See the License for the specific language governing permissions and
-#  limitations under the License.
-
 """Paid media platform report pulling pipeline.
-
-This script pulls data from Google Ads, Microsoft Ads and Adobe Analytics
-And writes it to a custom database for later report generation.
-It is assumed that this will be run from the command line with the quarter
-passed as an argument. As the database tables are determined by these
-parameters, this script will not work in an IDE.
-
-This script requires that `SQLAlchemy` be installed within the Python
-environment you are running this script in.
-
-This file can also be imported as a module and contains the following
-functions:
-    * main - the main function of the script
+Version 2
 """
+
 import sys
 
 # Leave this import for app execution timing. It is actually used.
@@ -44,6 +19,7 @@ from dg_adobe import adobe_report_builder
 from dg_config.settingsfile import get_settings
 from dg_date import daterange
 from dg_db.db_utils import init_db
+from dg_db.populate import populate_accounts, populate_skews
 from dg_google import google_ads_report_builder
 from dg_microsoft import microsoft_ads_report_builder
 from rich.console import Console
@@ -68,7 +44,6 @@ def main(quarter):
 
     # Truncate and setup database tables with SQLAlchemy
     console.print('Truncating database tables...')
-    # ToDo: Truncate individual tables at report runtime, not all at once.
     init_db()
     console.print('Tables truncated.')
 
@@ -84,8 +59,11 @@ def main(quarter):
     # console.print("Adobe Date Range is: ", adobe_date_range_start, adobe_date_range_end)
     console.print("Adobe Date Range is: ", adobe_full_date_range)
 
+    # Seed Countries to DB
+    populate_accounts()
+
     # Get the Skews
-    get_skews(quarter)
+    populate_skews()
 
     # Initialize the report retrieval flow. Stagger & sleep for rate limiting.
     # Start the Accounts report flow for all platforms.
@@ -115,14 +93,4 @@ def main(quarter):
 #  a global variable instead of accessing them directly in the model for
 #  dynamic table creation.
 if __name__ == "__main__":
-    # Set up argparse and support reporting for previous quarter.
-    parser = argparse.ArgumentParser(
-        description="Updates/backfills database with SEM platform reporting.")
-    parser.add_argument("-q", "--quarter",
-                        type=int,
-                        default=fiscalyear.FiscalQuarter.current().quarter,
-                        help="The quarter as an integer. 1, 2, 3 or 4 which "
-                             "will be for the current fiscal year.")
-    args = parser.parse_args()
-
-    main(args.quarter)
+    main(4)
