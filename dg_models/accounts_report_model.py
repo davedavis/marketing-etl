@@ -5,7 +5,6 @@ from sqlalchemy.orm import relationship
 
 from dg_config import settingsfile
 from dg_models.base_model import Base
-import argparse
 
 settings = settingsfile.get_settings()
 
