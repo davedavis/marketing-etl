@@ -13,7 +13,6 @@ import dg_utils.timing
 
 # This module is required for custom qtr & weeks based on company fiscal year.
 import fiscalyear
-import argparse
 
 from dg_adobe import adobe_report_builder
 from dg_config.settingsfile import get_settings
