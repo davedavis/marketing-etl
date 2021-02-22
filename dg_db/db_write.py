@@ -14,7 +14,6 @@
 #  limitations under the License.
 import time
 from datetime import datetime
-from tqdm import tqdm as tqdm
 
 # Import DB utils
 from google.ads.google_ads.client import GoogleAdsClient
@@ -45,33 +44,35 @@ from dg_utils.region_converter import get_region
 
 settings = settingsfile.get_settings()
 
-# ToDo: Extract FK extraction to separate method.
-# Get the foreign Keys for all Accounts as we can't insert with a query on a foreign key using
-# SQLAlchemy bulk insert.
-account_fk_dict = {}
-google_platform_fk_dict = {}
-microsoft_platform_fk_dict = {}
-session = get_session()
-accounts = session.query(Account.id, Account.account_name).all()
+
+def get_foreign_keys(table_name):
+    # Get the foreign Keys for all Accounts as we can't insert with a query on a foreign key using
+    # SQLAlchemy bulk insert.
+    account_fk_dict = {}
+    google_platform_fk_dict = {}
+    microsoft_platform_fk_dict = {}
+    session = get_session()
+
+    if table_name == "accounts":
+        accounts = session.query(Account.id, Account.account_name).all()
+        for account in accounts:
+            account_fk_dict.update({account.account_name: account.id})
+        return account_fk_dict
+
+    elif table_name == "google_platforms":
+        google_platforms = session.query(Platform.id, Platform.account).filter_by(platform="Google").all()
+        for platform in google_platforms:
+            google_platform_fk_dict.update({platform.account: platform.id})
+        return google_platform_fk_dict
 
 
-google_platforms = session.query(Platform.id, Platform.account).filter_by(platform="Google").all()
-# Platform ID, given the account ID
+    elif table_name == "microsoft_platforms":
+        microsoft_platforms = session.query(Platform.id, Platform.account).filter_by(platform="Microsoft").all()
+        for platform in microsoft_platforms:
+            microsoft_platform_fk_dict.update({platform.account: platform.id})
+        return microsoft_platform_fk_dict
 
-
-microsoft_platforms = session.query(Platform.id, Platform.account).filter_by(platform="Microsoft").all()
-
-for account in accounts:
-    account_fk_dict.update({account.account_name: account.id})
-
-for platform in google_platforms:
-    google_platform_fk_dict.update({platform.account: platform.id})
-
-
-for platform in microsoft_platforms:
-    microsoft_platform_fk_dict.update({platform.account: platform.id})
-
-session.close()
+    session.close()
 
 
 def write_google_report_to_db(report_results, report_type):
@@ -229,12 +230,15 @@ def write_adobe_emea_metrics_report(report_results):
     # Create a list to contain tuples from the response that we'll add to the database.
     metrics_report_records_to_insert = []
 
+    account_fks = get_foreign_keys("accounts")
+
     # Loop through the returned records and do something with them.
     for record in report_results:
         ## Convert the string date returned to a datetime object
         record_date = datetime.strptime(record[1], '%b %d, %Y')
 
-        report_record = MetricsReportRecord(account=account_fk_dict.get(clean_country_name(record[0])),
+
+        report_record = MetricsReportRecord(account=account_fks.get(clean_country_name(record[0])),
                                             date=record_date.date(),
                                             week=get_week_in_quarter(record_date),
                                             revenue=record[2],
@@ -287,11 +291,15 @@ def write_google_accounts_report(report_results):
     # Create a list to contain tuples from the response that we'll add to the database.
     accounts_report_records_to_insert = []
 
+    account_fks = get_foreign_keys("accounts")
+    google_platform_fks = get_foreign_keys("google_platforms")
+
     # Loop through the returned records and do something with them.
     for record in report_results:
+
         report_record = AccountReportRecord(
-            account=account_fk_dict.get(clean_country_name(record.customer.descriptive_name)),
-            platform=google_platform_fk_dict.get(account_fk_dict.get(clean_country_name(record.customer.descriptive_name))),
+            account=account_fks.get(clean_country_name(record.customer.descriptive_name)),
+            platform=google_platform_fks.get(account_fks.get(clean_country_name(record.customer.descriptive_name))),
             date=record.segments.date,
             week=get_week_in_quarter(
                 datetime.strptime(record.segments.date, "%Y-%m-%d")),
@@ -496,15 +504,19 @@ def write_microsoft_accounts_report(report_results):
     # Create a list to contain tuples from the response that we'll add to the database.
     accounts_report_records_to_insert = []
 
+    account_fks = get_foreign_keys("accounts")
+    microsoft_platform_fks = get_foreign_keys("microsoft_platforms")
+
     # Loop through the returned records and do something with them.
     for record in report_results:
-        report_record = AccountReportRecord(account=account_fk_dict.get(clean_country_name(record.value('AccountName'))),
-                                            platform=google_platform_fk_dict.get(account_fk_dict.get(clean_country_name(record.value('AccountName')))),
-                                            date=record.value('TimePeriod'),
-                                            week=get_week_in_quarter(datetime.strptime(record.value('TimePeriod'), '%Y-%m-%d')),
-                                            impressions=record.value('Impressions'),
-                                            clicks=record.value('Clicks'),
-                                            spend=record.value('Spend'))
+        report_record = AccountReportRecord(
+            account=account_fks.get(clean_country_name(record.value('AccountName'))),
+            platform=microsoft_platform_fks.get(account_fks.get(clean_country_name(record.value('AccountName')))),
+            date=record.value('TimePeriod'),
+            week=get_week_in_quarter(datetime.strptime(record.value('TimePeriod'), '%Y-%m-%d')),
+            impressions=record.value('Impressions'),
+            clicks=record.value('Clicks'),
+            spend=record.value('Spend'))
 
         accounts_report_records_to_insert.append(report_record)
 
