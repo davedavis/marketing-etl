@@ -8,7 +8,6 @@ import sys
 
 # Leave this import for app execution timing. It is actually used.
 from time import sleep
-
 import dg_utils.timing
 
 # This module is required for custom qtr & weeks based on company fiscal year.
@@ -35,7 +34,7 @@ def main(quarter, year):
 
     Args:
         quarter (int): The fiscal quarter the reports should be pulled for.
-        year (int): The fiscal year the reports should be pulled for.
+        year (str): The fiscal year the reports should be pulled for. "last" otherwise "this".
 
     """
 
@@ -49,14 +48,12 @@ def main(quarter, year):
 
     # Set date range.
     console.print('Calculating date range for reports..')
-    google_date_range = daterange.get_google_date_range(quarter)
-    bing_date_range_start, bing_date_range_end = daterange.get_bing_date_range(quarter)
-    # adobe_date_range_start, adobe_date_range_end = daterange.get_adobe_date_range(quarter)
-    adobe_full_date_range = daterange.get_full_adobe_date_range(quarter)
+    google_date_range = daterange.get_google_date_range(quarter, year)
+    bing_date_range_start, bing_date_range_end = daterange.get_bing_date_range(quarter, year)
+    adobe_full_date_range = daterange.get_adobe_date_range(quarter, year)
 
     console.print("Google Date Range is: ", google_date_range)
     console.print("Bing Date Range is: ", bing_date_range_start, bing_date_range_end)
-    # console.print("Adobe Date Range is: ", adobe_date_range_start, adobe_date_range_end)
     console.print("Adobe Date Range is: ", adobe_full_date_range)
 
     # Database initialization with seed data.
@@ -69,11 +66,11 @@ def main(quarter, year):
 
     # Initialize the report retrieval flow. Stagger & sleep for rate limiting.
     # Start the Accounts report flow for all platforms.
-    # google_ads_report_builder.get_report(google_date_range, report_type="accounts")
-    # microsoft_ads_report_builder.get_report(bing_date_range_start, bing_date_range_end, report_type="accounts")
+    google_ads_report_builder.get_report(google_date_range, report_type="accounts")
+    microsoft_ads_report_builder.get_report(bing_date_range_start, bing_date_range_end, report_type="accounts")
 
     # # Start the Campaigns report flow for all platforms.
-    # google_ads_report_builder.get_report(google_date_range, report_type="campaigns")
+    google_ads_report_builder.get_report(google_date_range, report_type="campaigns")
     microsoft_ads_report_builder.get_report(bing_date_range_start, bing_date_range_end, report_type="campaigns")
 
     # # Start the Search Ads report flow for all platforms.
@@ -90,4 +87,4 @@ def main(quarter, year):
 
 # ToDo: Remove the
 if __name__ == "__main__":
-    main(4, 2021)
+    main(4, "last")

@@ -37,7 +37,8 @@ def get_campaign_report_type(date_range):
                                 campaign.status, campaign.name, campaign.id, campaign.advertising_channel_type
                          FROM campaign 
                          WHERE segments.date 
-                         BETWEEN {date_range}'''
+                         BETWEEN {date_range}
+                         AND metrics.cost_micros > 0'''
     return report_request
 
 
