@@ -29,12 +29,13 @@ console = Console()
 settings = get_settings()
 
 
-def main(quarter):
+def main(quarter, year):
     """Gets the reports from platforms and writes them to the appropriate
        DB tables in the database defined in the settings.yaml file.
 
     Args:
         quarter (int): The fiscal quarter the reports should be pulled for.
+        year (int): The fiscal year the reports should be pulled for.
 
     """
 
@@ -68,12 +69,12 @@ def main(quarter):
 
     # Initialize the report retrieval flow. Stagger & sleep for rate limiting.
     # Start the Accounts report flow for all platforms.
-    google_ads_report_builder.get_report(google_date_range, report_type="accounts")
-    microsoft_ads_report_builder.get_report(bing_date_range_start, bing_date_range_end, report_type="accounts")
+    # google_ads_report_builder.get_report(google_date_range, report_type="accounts")
+    # microsoft_ads_report_builder.get_report(bing_date_range_start, bing_date_range_end, report_type="accounts")
 
     # # Start the Campaigns report flow for all platforms.
     # google_ads_report_builder.get_report(google_date_range, report_type="campaigns")
-    # microsoft_ads_report_builder.get_report(bing_date_range_start, bing_date_range_end, report_type="campaigns")
+    microsoft_ads_report_builder.get_report(bing_date_range_start, bing_date_range_end, report_type="campaigns")
 
     # # Start the Search Ads report flow for all platforms.
     # google_ads_report_builder.get_report(google_date_range, report_type="ads")
@@ -83,11 +84,10 @@ def main(quarter):
     # google_ads_report_builder.get_report(google_date_range, report_type="shopping")
     # microsoft_ads_report_builder.get_report(bing_date_range_start, bing_date_range_end, report_type="shopping")
 
-    # ToDo: Clean up old Adobe implementation
     # Start the Adobe Revenue report flow.
     adobe_report_builder.get_report(adobe_full_date_range, report_type="emea_metrics")
 
 
 # ToDo: Remove the
 if __name__ == "__main__":
-    main(4)
+    main(4, 2021)

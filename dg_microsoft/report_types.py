@@ -102,14 +102,23 @@ def get_campaign_report_type(start_date, end_date):
     report_columns = reporting_service.factory.create('ArrayOfCampaignPerformanceReportColumn')
     report_columns.CampaignPerformanceReportColumn.append([
         'AccountName',
+        'CampaignStatus',
         'TimePeriod',
-        'AccountNumber',
         'CampaignId',
         'CampaignName',
         'Network',
         'Impressions',
         'Clicks',
-        'Spend'
+        'Spend',
+        'Conversions',
+        'CostPerConversion',
+        'RevenuePerConversion',
+        'AllRevenue',
+        'ConversionRate',
+        'AllReturnOnAdSpend',
+        'ImpressionSharePercent',
+        'ImpressionLostToBudgetPercent',
+        'ImpressionLostToRankAggPercent',
     ])
     report_request.Columns = report_columns
 

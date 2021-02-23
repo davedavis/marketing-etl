@@ -18,7 +18,7 @@ max_allowed_packets setting to something large for the ads reports to
 actually write to the DB. So in your /etc/my.cnf file, add:
 
 `[mysqld]
-max_allowed_packet=16M
+max_allowed_packet=999M
 `
 
 

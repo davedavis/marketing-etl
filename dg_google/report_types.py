@@ -27,14 +27,17 @@ def get_account_report_type(date_range):
     return report_request
 
 
+
 def get_campaign_report_type(date_range):
     report_request = f'''SELECT customer.descriptive_name, segments.date, metrics.cost_micros, metrics.clicks, 
-                                metrics.impressions,
+                                metrics.impressions, metrics.impressions, metrics.cost_per_conversion,
+                                metrics.value_per_conversion, metrics.conversions_value, 
+                                metrics.conversions_from_interactions_rate, metrics.search_impression_share, 
+                                metrics.search_budget_lost_impression_share, metrics.search_rank_lost_impression_share,
                                 campaign.status, campaign.name, campaign.id, campaign.advertising_channel_type
                          FROM campaign 
                          WHERE segments.date 
-                         BETWEEN {date_range}
-                         AND metrics.cost_micros > 0'''
+                         BETWEEN {date_range}'''
     return report_request
 
 

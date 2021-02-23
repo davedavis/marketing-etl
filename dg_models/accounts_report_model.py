@@ -14,7 +14,7 @@ class AccountReportRecord(Base):
     __tablename__ = 'AccountsReport'
     __tableargs__ = {'schema': settings['db_database']}
 
-    report_id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True)
     account = Column(Integer, ForeignKey('Account.id'))
     platform = Column(Integer, ForeignKey('Platform.id'))
     date = Column(Date)

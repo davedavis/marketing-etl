@@ -97,10 +97,7 @@ def write_google_report_to_db(report_results, report_type):
 def write_adobe_report_to_db(report_results, report_type):
     console.print(f"Adobe {report_type} report received, writing to DB...")
 
-    if report_type == 'core_metrics':
-        write_adobe_core_metrics_report(report_results)
-
-    elif report_type == 'emea_metrics':
+    if report_type == 'emea_metrics':
         write_adobe_emea_metrics_report(report_results)
 
     else:
@@ -193,39 +190,6 @@ def write_countries(countries):
     console.print("All Countries added to DB")
 
 
-def write_adobe_core_metrics_report(report_results):
-    # Create a list to contain tuples from the response that we'll add to the database.
-    metrics_report_records_to_insert = []
-
-    # Loop through the returned records and do something with them.
-    for record in report_results:
-        report_record = MetricsReportRecord(account_name=clean_country_name(record[1]),
-                                            account_region=get_region(record[1]),
-                                            time_period=record[0],
-                                            week=get_week_in_quarter(record[0]),
-                                            revenue=record[2],
-                                            conversion_rate=record[3] * 100,
-                                            visits=record[4],
-                                            orders=record[5],
-                                            aov=record[6],
-                                            units=record[7],
-                                            aur=record[8])
-
-        # session.add(report_record)
-        metrics_report_records_to_insert.append(report_record)
-
-    # Set up DB session
-    session = get_session()
-    # Bulk save the records from the list
-    session.bulk_save_objects(metrics_report_records_to_insert)
-    # Commit the session
-    session.commit()
-    # Close the session
-    session.close()
-
-    console.print("All Adobe Records added to DB")
-
-
 def write_adobe_emea_metrics_report(report_results):
     # Create a list to contain tuples from the response that we'll add to the database.
     metrics_report_records_to_insert = []
@@ -236,7 +200,6 @@ def write_adobe_emea_metrics_report(report_results):
     for record in report_results:
         ## Convert the string date returned to a datetime object
         record_date = datetime.strptime(record[1], '%b %d, %Y')
-
 
         report_record = MetricsReportRecord(account=account_fks.get(clean_country_name(record[0])),
                                             date=record_date.date(),
@@ -291,21 +254,21 @@ def write_google_accounts_report(report_results):
     # Create a list to contain tuples from the response that we'll add to the database.
     accounts_report_records_to_insert = []
 
+    # Get foreign keys
     account_fks = get_foreign_keys("accounts")
     google_platform_fks = get_foreign_keys("google_platforms")
 
     # Loop through the returned records and do something with them.
     for record in report_results:
-
         report_record = AccountReportRecord(
             account=account_fks.get(clean_country_name(record.customer.descriptive_name)),
             platform=google_platform_fks.get(account_fks.get(clean_country_name(record.customer.descriptive_name))),
             date=record.segments.date,
-            week=get_week_in_quarter(
-                datetime.strptime(record.segments.date, "%Y-%m-%d")),
+            week=get_week_in_quarter(datetime.strptime(record.segments.date, "%Y-%m-%d")),
             impressions=record.metrics.impressions,
             clicks=record.metrics.clicks,
-            spend=record.metrics.cost_micros / 1000000)
+            spend=record.metrics.cost_micros / 1000000
+        )
 
         # session.add(report_record)
         accounts_report_records_to_insert.append(report_record)
@@ -327,24 +290,38 @@ def write_google_campaigns_report(report_results):
     tgc = time.time()
     campaigns_report_records_to_insert = []
 
-    for record in report_results:
-        # Get the channel ENUM from the client so we can see the specific network the ad was run on.
-        # Search, Shopping, Display, Display Select etc.
-        channel = GoogleAdsClient.get_type('AdvertisingChannelTypeEnum')
+    # Get foreign keys
+    account_fks = get_foreign_keys("accounts")
+    google_platform_fks = get_foreign_keys("google_platforms")
 
-        report_record = CampaignReportRecord(platform="Google",
-                                             account_name=clean_country_name(record.customer.descriptive_name),
-                                             account_number=record.customer.resource_name.split("/")[1],
-                                             time_period=record.segments.date,
-                                             week=get_week_in_quarter(
-                                                 datetime.strptime(record.segments.date, "%Y-%m-%d")),
-                                             campaign=record.campaign.name,
-                                             campaign_id=record.campaign.id,
-                                             network=channel.AdvertisingChannelType.Name(
-                                                 record.campaign.advertising_channel_type).title(),
-                                             impressions=record.metrics.impressions,
-                                             clicks=record.metrics.clicks,
-                                             spend=record.metrics.cost_micros / 1000000)
+    # Get the channel ENUM from the client so we can see the specific network the ad was run on.
+    # Search, Shopping, Display, Display Select etc.
+    channel = GoogleAdsClient.get_type('AdvertisingChannelTypeEnum')
+    status = GoogleAdsClient.get_type('CampaignStatusEnum')
+
+    for record in report_results:
+        report_record = CampaignReportRecord(
+            account=account_fks.get(clean_country_name(record.customer.descriptive_name)),
+            platform=google_platform_fks.get(account_fks.get(clean_country_name(record.customer.descriptive_name))),
+            status=status.CampaignStatus.Name(record.campaign.status).title(),
+            date=record.segments.date,
+            week=get_week_in_quarter(datetime.strptime(record.segments.date, "%Y-%m-%d")),
+            campaign_name=record.campaign.name,
+            campaign_id=record.campaign.id,
+            network=channel.AdvertisingChannelType.Name(record.campaign.advertising_channel_type).title(),
+            impressions=record.metrics.impressions,
+            clicks=record.metrics.clicks,
+            spend=record.metrics.cost_micros / 1000000,
+            conversions=record.metrics.conversions,
+            cost_per_conversion=record.metrics.cost_per_conversion / 1000000,
+            value_per_conversion=record.metrics.value_per_conversion,
+            conversion_value=record.metrics.conversions_value,
+            conversion_rate=record.metrics.conversions_from_interactions_rate,
+            conversion_value_per_cost=record.metrics.conversions_value / record.metrics.cost_micros * 1000000,
+            impression_share=record.metrics.search_impression_share,
+            budget_lost_is=record.metrics.search_budget_lost_impression_share,
+            rank_lost_is=record.metrics.search_rank_lost_impression_share
+        )
 
         # session.add(report_record)
         campaigns_report_records_to_insert.append(report_record)
@@ -538,19 +515,34 @@ def write_microsoft_campaigns_report(report_results):
 
     campaigns_report_records_to_insert = []
 
+    # Get foreign keys
+    account_fks = get_foreign_keys("accounts")
+    microsoft_platform_fks = get_foreign_keys("microsoft_platforms")
+
     for record in report_results:
-        report_record = CampaignReportRecord(platform='Microsoft',
-                                             account_name=clean_country_name(record.value('AccountName')),
-                                             account_number=record.value('AccountNumber'),
-                                             time_period=record.value('TimePeriod'),
-                                             week=get_week_in_quarter(
-                                                 datetime.strptime(record.value('TimePeriod'), '%Y-%m-%d')),
-                                             campaign=record.value('CampaignName'),
-                                             campaign_id=record.value('CampaignId'),
-                                             network=record.value('Network'),
-                                             impressions=record.value('Impressions'),
-                                             clicks=record.value('Clicks'),
-                                             spend=record.value('Spend'))
+        report_record = CampaignReportRecord(
+            account=account_fks.get(clean_country_name(record.value('AccountName'))),
+            platform=microsoft_platform_fks.get(account_fks.get(clean_country_name(record.value('AccountName')))),
+            status=record.value('CampaignStatus'),
+            date=record.value('TimePeriod'),
+            week=get_week_in_quarter(datetime.strptime(record.value('TimePeriod'), '%Y-%m-%d')),
+            campaign_name=record.value('CampaignName'),
+            campaign_id=record.value('CampaignId'),
+            network=record.value('Network'),
+            impressions=record.value('Impressions'),
+            clicks=record.value('Clicks'),
+            spend=record.value('Spend'),
+            conversions=record.value('Conversions'),
+            cost_per_conversion=float('0' + record.value('CostPerConversion')),
+            value_per_conversion=float('0' + record.value('RevenuePerConversion')),
+            conversion_value=float('0' + record.value('AllRevenue')),
+            conversion_rate=float('0' + record.value('ConversionRate').strip('%')) / 100,
+            conversion_value_per_cost=float('0' + record.value('AllReturnOnAdSpend')),
+            impression_share=float('0' + record.value('ImpressionSharePercent').strip('%')),
+            budget_lost_is=float('0' + record.value('ImpressionLostToBudgetPercent').strip('%')),
+            rank_lost_is=float('0' + record.value('ImpressionLostToRankAggPercent').strip('%'))
+
+        )
 
         campaigns_report_records_to_insert.append(report_record)
 

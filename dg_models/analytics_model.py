@@ -13,7 +13,7 @@ class MetricsReportRecord(Base):
     __tablename__ = 'AnalyticsReport'
     __tableargs__ = {'schema': settings['db_database']}
 
-    report_id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True)
     account = Column(Integer, ForeignKey('Account.id'))
     date = Column(Date)
     week = Column(Integer)
