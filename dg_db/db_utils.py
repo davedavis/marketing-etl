@@ -23,10 +23,10 @@ def get_session():
 
 def delete_current_q_records():
     sess = get_session()
-    too_new = get_start_of_quarter(datetime.now())
-    sess.query(AccountReportRecord).filter(AccountReportRecord.date >= too_new).delete(synchronize_session=False)
-    sess.query(CampaignReportRecord).filter(CampaignReportRecord.date >= too_new).delete(synchronize_session=False)
-    sess.query(MetricsReportRecord).filter(MetricsReportRecord.date >= too_new).delete(synchronize_session=False)
+    start_of_quarter = get_start_of_quarter(datetime.now())
+    sess.query(AccountReportRecord).filter(AccountReportRecord.date >= start_of_quarter).delete(synchronize_session=False)
+    sess.query(CampaignReportRecord).filter(CampaignReportRecord.date >= start_of_quarter).delete(synchronize_session=False)
+    sess.query(MetricsReportRecord).filter(MetricsReportRecord.date >= start_of_quarter).delete(synchronize_session=False)
 
     sess.commit()
     print("All records for this quarter have been dropped. Carry on.")
