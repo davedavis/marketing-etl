@@ -43,8 +43,15 @@ def main(quarter, year):
 
     # Truncate and setup database tables with SQLAlchemy
     console.print('Truncating database tables...')
-    init_db()
-    console.print('Tables truncated.')
+    init_db(quarter, year)
+
+    # Database initialization with seed data.
+    # Seed Countries to DB
+    # populate_accounts()
+    # # Seed Platforms to DB
+    # populate_platforms()
+    # # Get the Skews
+    # populate_skews()
 
     # Set date range.
     console.print('Calculating date range for reports..')
@@ -55,14 +62,6 @@ def main(quarter, year):
     console.print("Google Date Range is: ", google_date_range)
     console.print("Bing Date Range is: ", bing_date_range_start, bing_date_range_end)
     console.print("Adobe Date Range is: ", adobe_full_date_range)
-
-    # Database initialization with seed data.
-    # Seed Countries to DB
-    populate_accounts()
-    # Seed Platforms to DB
-    populate_platforms()
-    # Get the Skews
-    populate_skews()
 
     # Initialize the report retrieval flow. Stagger & sleep for rate limiting.
     # Start the Accounts report flow for all platforms.
@@ -85,6 +84,5 @@ def main(quarter, year):
     adobe_report_builder.get_report(adobe_full_date_range, report_type="emea_metrics")
 
 
-# ToDo: Remove the
 if __name__ == "__main__":
-    main(4, "last")
+    main(4, "this")

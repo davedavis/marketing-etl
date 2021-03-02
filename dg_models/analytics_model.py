@@ -17,6 +17,7 @@ class MetricsReportRecord(Base):
     account = Column(Integer, ForeignKey('Account.id'))
     date = Column(Date)
     week = Column(Integer)
+    quarter = Column(Integer)
     revenue = Column(Float)
     conversion_rate = Column(Float)
     visits = Column(Float)

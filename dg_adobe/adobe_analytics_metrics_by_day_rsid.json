@@ -39,7 +39,6 @@
         },
         {
             "type": "dateRange",
-            "dateRange": "2021-01-01T00:00:00.000/2021-02-17T00:00:00.000",
             "dateRange": "2021-01-01 00:00:00.000/2021-02-16 23:25:12.919"
         }
     ],
@@ -81,7 +80,7 @@
         "limit": 400,
         "page": 0,
         "dimensionSort": "asc",
-        "nonesBehavior": "return-nones"
+        "nonesBehavior": "exclude-nones"
     },
     "statistics": {
         "functions": [

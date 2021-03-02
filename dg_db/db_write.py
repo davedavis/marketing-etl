@@ -31,6 +31,7 @@ from rich.console import Console
 
 from dg_models.platform_model import Platform
 from dg_models.skew_model import Skew
+from dg_utils.quarter_utils import get_quarter_from_date
 
 console = Console()
 
@@ -204,6 +205,7 @@ def write_adobe_emea_metrics_report(report_results):
         report_record = MetricsReportRecord(account=account_fks.get(clean_country_name(record[0])),
                                             date=record_date.date(),
                                             week=get_week_in_quarter(record_date),
+                                            quarter=get_quarter_from_date(record_date),
                                             revenue=record[2],
                                             conversion_rate=record[3] * 100,
                                             visits=record[4],
@@ -265,6 +267,7 @@ def write_google_accounts_report(report_results):
             platform=google_platform_fks.get(account_fks.get(clean_country_name(record.customer.descriptive_name))),
             date=record.segments.date,
             week=get_week_in_quarter(datetime.strptime(record.segments.date, "%Y-%m-%d")),
+            quarter=get_quarter_from_date(datetime.strptime(record.segments.date, "%Y-%m-%d")),
             impressions=record.metrics.impressions,
             clicks=record.metrics.clicks,
             spend=record.metrics.cost_micros / 1000000
@@ -306,6 +309,7 @@ def write_google_campaigns_report(report_results):
             status=status.CampaignStatus.Name(record.campaign.status).title(),
             date=record.segments.date,
             week=get_week_in_quarter(datetime.strptime(record.segments.date, "%Y-%m-%d")),
+            quarter=get_quarter_from_date(datetime.strptime(record.segments.date, "%Y-%m-%d")),
             campaign_name=record.campaign.name,
             campaign_id=record.campaign.id,
             network=channel.AdvertisingChannelType.Name(record.campaign.advertising_channel_type).title(),
@@ -491,6 +495,7 @@ def write_microsoft_accounts_report(report_results):
             platform=microsoft_platform_fks.get(account_fks.get(clean_country_name(record.value('AccountName')))),
             date=record.value('TimePeriod'),
             week=get_week_in_quarter(datetime.strptime(record.value('TimePeriod'), '%Y-%m-%d')),
+            quarter=get_quarter_from_date(datetime.strptime(record.value('TimePeriod'), '%Y-%m-%d')),
             impressions=record.value('Impressions'),
             clicks=record.value('Clicks'),
             spend=record.value('Spend'))
@@ -526,6 +531,7 @@ def write_microsoft_campaigns_report(report_results):
             status=record.value('CampaignStatus'),
             date=record.value('TimePeriod'),
             week=get_week_in_quarter(datetime.strptime(record.value('TimePeriod'), '%Y-%m-%d')),
+            quarter=get_quarter_from_date(datetime.strptime(record.value('TimePeriod'), '%Y-%m-%d')),
             campaign_name=record.value('CampaignName'),
             campaign_id=record.value('CampaignId'),
             network=record.value('Network'),

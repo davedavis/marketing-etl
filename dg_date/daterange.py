@@ -18,56 +18,6 @@ import fiscalyear
 
 # Set up the date range object settings
 fiscalyear.setup_fiscal_calendar(start_year='same', start_month=4)
-# current_quarter = fiscalyear.FiscalQuarter.current()
-# last_quarter = fiscalyear.FiscalQuarter.prev_quarter
-# company_fiscal_year = fiscalyear.FiscalYear(2020)
-
-# # Last Quarter Settings
-# last_quarter_start_date = fiscalyear.FiscalQuarter.current().prev_quarter.start.strftime('%Y-%m-%d')
-# last_quarter_end_date = fiscalyear.FiscalQuarter.current().prev_quarter.end.strftime('%Y-%m-%d')
-#
-# bing_last_quarter_start = fiscalyear.FiscalQuarter.current().prev_quarter.start
-# bing_last_quarter_end = fiscalyear.FiscalQuarter.current().prev_quarter.end
-#
-# google_last_quarter_date_range = f'"{last_quarter_start_date}" AND "{last_quarter_end_date}"'
-
-# # Current quarter settings.
-# quarter_start_date = current_quarter.start.strftime('%Y-%m-%d')
-# quarter_current_date = fiscalyear.FiscalDateTime.now().strftime('%Y-%m-%d')
-# google_qtd_date_range = f'"{quarter_start_date}" AND "{quarter_current_date}"'
-# bing_current_quarter_start = current_quarter.start
-# bing_current_quarter_end = fiscalyear.FiscalDateTime.now()
-
-
-# # Simply return the date range objects as requested from main.
-# def google_thisq():
-#     """ Gets current quarter start date and returns a Google formatted start date date object """
-#     return google_qtd_date_range
-#
-#
-# def google_lastq():
-#     """ Gets last quarter start date and returns a Google formatted start date date object """
-#     return google_last_quarter_date_range
-#
-#
-# def bing_lastq_start():
-#     """ Gets last quarter start date and returns a Microsoft formatted start date date object """
-#     return bing_last_quarter_start
-#
-#
-# def bing_lastq_end():
-#     """ Gets last quarter start date and returns a Microsoft formatted end date date object """
-#     return bing_last_quarter_end
-#
-#
-# def bing_thisq_start():
-#     """ Gets current quarter start date and returns a Microsoft formatted start date date object """
-#     return bing_current_quarter_start
-#
-#
-# def bing_thisq_end():
-#     """ Gets current quarter start date and returns a Microsoft formatted end date date object """
-#     return bing_current_quarter_end
 
 
 def get_google_date_range(quarter, year):
@@ -80,13 +30,6 @@ def get_google_date_range(quarter, year):
     else:
         report_fiscal_year = datetime.datetime.now() - datetime.timedelta(days=90)
         company_fiscal_year = fiscalyear.FiscalYear(report_fiscal_year.year)
-
-    test1 = datetime.datetime.now() - datetime.timedelta(days=455)
-    test2 = datetime.datetime.now() - datetime.timedelta(days=90)
-
-    print(">>>>>>>>>>>>>>>>>>>>>> Last Fiscal Year: ", test1.year)
-    print(">>>>>>>>>>>>>>>>>>>>>> This Fiscal Year: ", test2.year)
-
 
     if quarter == 1:
         google_start_date = company_fiscal_year.q1.start.strftime('%Y-%m-%d')
@@ -105,41 +48,6 @@ def get_google_date_range(quarter, year):
 
     google_formatted_date_range = f'"{google_start_date}" AND "{google_end_date}"'
     return google_formatted_date_range
-
-
-# def get_adobe_date_range(quarter, year):
-#     adobe_start_date = ""
-#     adobe_end_date = ""
-#
-#     if year == "last":
-#         report_fiscal_year = datetime.datetime.now() - datetime.timedelta(days=455)
-#         company_fiscal_year = fiscalyear.FiscalYear(report_fiscal_year.year)
-#     else:
-#         report_fiscal_year = datetime.datetime.now() - datetime.timedelta(days=90)
-#         company_fiscal_year = fiscalyear.FiscalYear(report_fiscal_year.year)
-#
-#     if quarter == 1:
-#         adobe_start_date = company_fiscal_year.q1.start
-#         adobe_end_date = company_fiscal_year.q1.end
-#     elif quarter == 2:
-#         adobe_start_date = company_fiscal_year.q2.start
-#         adobe_end_date = company_fiscal_year.q2.end
-#     elif quarter == 3:
-#         adobe_start_date = company_fiscal_year.q3.start
-#         adobe_end_date = company_fiscal_year.q3.end
-#     elif quarter == 4:
-#         adobe_start_date = company_fiscal_year.q4.start
-#         adobe_end_date = company_fiscal_year.q4.end
-#     else:
-#         print("You didn't pass in a valid quarter number. Options are 1, 2, 3 or 4")
-#
-#     # If the requested quarter is this quarter, set the end date to today, and not the end of the quarter as Microsoft
-#     # Ads doesn't support using future dates (and ignoring them) in the API like Google does.
-#     if fiscalyear.FiscalQuarter.current().quarter == quarter:
-#         adobe_end_date = datetime.datetime.now()
-#
-#     adobe_formatted_date_range = adobe_start_date, adobe_end_date
-#     return adobe_formatted_date_range
 
 
 def get_adobe_date_range(quarter, year):

@@ -18,6 +18,7 @@ class CampaignReportRecord(Base):
     status = Column(String(length=16))
     date = Column(Date)
     week = Column(Integer)
+    quarter = Column(Integer)
     campaign_name = Column(String(length=512))
     campaign_id = Column(String(length=32))
     network = Column(String(length=32), default="Unknown")

@@ -19,6 +19,7 @@ class AccountReportRecord(Base):
     platform = Column(Integer, ForeignKey('Platform.id'))
     date = Column(Date)
     week = Column(Integer)
+    quarter = Column(Integer)
     impressions = Column(Float)
     clicks = Column(Float)
     spend = Column(Float)
