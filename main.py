@@ -1,17 +1,16 @@
 #  #!/usr/bin python
 
-"""Paid media platform report pulling pipeline.
-Version 2
+"""Paid media and analytics ETL pipeline.
+   Pulls report data from Google Ads, Microsoft Ads as well as metrics and dimensions from Adobe Analytics.
+   Creates models for accounts, platforms and fiscal business week/quarters and creates relationships between
+   these and the the report models. Once data is extracted and transformed, it's loaded into a database for
+   much easier querying and report building.
+
+   All settings and info on each can be found in the settings.yaml file and all are required.
 """
 
-import sys
-
-# Leave this import for app execution timing. It is actually used.
-from time import sleep
+# Leave this import for convenient app execution timing. It is actually used.
 import dg_utils.timing
-
-# This module is required for custom qtr & weeks based on company fiscal year.
-import fiscalyear
 
 from dg_adobe import adobe_report_builder
 from dg_config.settingsfile import get_settings
