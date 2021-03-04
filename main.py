@@ -10,6 +10,8 @@
 """
 
 # Leave this import for convenient app execution timing. It is actually used.
+from time import sleep
+
 import dg_utils.timing
 
 from dg_adobe import adobe_report_builder
@@ -20,8 +22,6 @@ from dg_db.populate import populate_accounts, populate_skews, populate_platforms
 from dg_google import google_ads_report_builder
 from dg_microsoft import microsoft_ads_report_builder
 from rich.console import Console
-
-from dg_skews.skew_builder import get_skews
 
 console = Console()
 settings = get_settings()

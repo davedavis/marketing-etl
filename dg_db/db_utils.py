@@ -29,10 +29,11 @@ def delete_current_q_records():
     sess.query(MetricsReportRecord).filter(MetricsReportRecord.date >= start_of_quarter).delete(synchronize_session=False)
 
     sess.commit()
-    console.print("All records for this quarter have been deleted. Carry on.", style="bold, green")
+    console.print("All records for this quarter have been deleted. Carry on.", style="bold green")
 
 
 def init_db(quarter, year):
+    Base.metadata.create_all()
     console.print(f'Initializing database for {year} year')
 
     # If the report requested is for the current quarter, delete all the
@@ -40,10 +41,11 @@ def init_db(quarter, year):
     # update/adjust their metrics (particularly spend metrics) as fraudulent/invalid
     # clicks are refunded.
     if year == 'this' and quarter == get_quarter_from_date(datetime.now()):
-        console.print("Report is for this year and this quarter. Dropping records for this quarter.", style="bold, red")
+        console.print("Report is for this year and this quarter. Dropping records for this quarter.", style="bold red")
         delete_current_q_records()
     else:
         console.print("Report is not for this quarter and no records have been deleted.", style="bold green")
 
+    # ToDo : Clean up
     # Base.metadata.drop_all(engine)
-    Base.metadata.create_all()
+    # Base.metadata.create_all()

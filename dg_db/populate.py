@@ -82,12 +82,12 @@ def populate_skews():
         ("BE", 73444, 450679, 0.16, 0.02, 0.05, 0.07, 0.08, 0.07, 0.08, 0.12, 0.08, 0.09, 0.08, 0.08, 0.08, 0.08, 0.03)
     ]
 
-    q4_skews = []
+    formatted_skews = []
 
     # Format skew list into DB table format.
     for row in records_to_insert:
         skew_range = range(4, 18)
         for n, week in enumerate(skew_range):
-            q4_skews.append((row[0], 4, n + 1, row[1] * row[week], row[2] * row[week], row[3]))
+            formatted_skews.append((row[0], 4, n + 1, row[1] * row[week], row[2] * row[week], row[3]))
 
-    write_skews(q4_skews)
+    write_skews(formatted_skews)
