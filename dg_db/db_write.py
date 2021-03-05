@@ -347,6 +347,10 @@ def write_google_search_ads_report(report_results):
     tgsa = time.time()
     ads_report_records_to_insert = []
 
+    # Get foreign keys
+    account_fks = get_foreign_keys("accounts")
+    google_platform_fks = get_foreign_keys("google_platforms")
+
     for record in report_results:
         # Handle RSA ad types first as SQLAlchemy needs to insert uniform objects..
         # Create a list for each of the RSA asset sets that comes back. Initialize to empty string for uniformity.
@@ -380,11 +384,11 @@ def write_google_search_ads_report(report_results):
             description2 = record.ad_group_ad.ad.expanded_text_ad.description2
 
         # Build the record for insertion.
-        report_record = AdReportRecord(platform='Google',
-                                       account_name=clean_country_name(record.customer.descriptive_name),
-                                       account_number=record.customer.resource_name.split("/")[1],
-                                       time_period=record.segments.date,
+        report_record = AdReportRecord(account=account_fks.get(clean_country_name(record.customer.descriptive_name)),
+                                       platform=google_platform_fks.get(account_fks.get(clean_country_name(record.customer.descriptive_name))),
+                                       date=record.segments.date,
                                        week=get_week_in_quarter(datetime.strptime(record.segments.date, "%Y-%m-%d")),
+                                       quarter=get_quarter_from_date(datetime.strptime(record.segments.date, "%Y-%m-%d")),
                                        campaign=record.campaign.name,
                                        currency=record.customer.currency_code,
                                        impressions=record.metrics.impressions,
@@ -441,16 +445,20 @@ def write_google_shopping_ads_report(report_results):
     tgshop = time.time()
     shopping_ads_report_records_to_insert = []
 
+    # Get foreign keys
+    account_fks = get_foreign_keys("accounts")
+    google_platform_fks = get_foreign_keys("google_platforms")
+
     for record in report_results:
         # Get the channel ENUM from the client so we can see the specific network the ad was run on.
         # Search, Shopping, Display, Display Select etc.
         channel = GoogleAdsClient.get_type('AdvertisingChannelTypeEnum')
 
-        report_record = AdReportRecord(platform='Google',
-                                       account_name=clean_country_name(record.customer.descriptive_name),
-                                       account_number=record.customer.resource_name.split("/")[1],
-                                       time_period=record.segments.date,
+        report_record = AdReportRecord(account=account_fks.get(clean_country_name(record.customer.descriptive_name)),
+                                       platform=google_platform_fks.get(account_fks.get(clean_country_name(record.customer.descriptive_name))),
+                                       date=record.segments.date,
                                        week=get_week_in_quarter(datetime.strptime(record.segments.date, "%Y-%m-%d")),
+                                       quarter=get_quarter_from_date(datetime.strptime(record.segments.date, "%Y-%m-%d")),
                                        campaign=record.campaign.name,
                                        currency=record.customer.currency_code,
                                        impressions=record.metrics.impressions,
@@ -476,7 +484,7 @@ def write_google_shopping_ads_report(report_results):
     session.close()
 
     console.print(
-        "Total time for adding Google shopping ads to the database was " + str(time.time() - tgshop)[:-15] + " secs ")
+        "Total time for adding Google shopping ads to the database was " + str(time.time() - tgshop)[:-14] + " secs ")
 
 
 def write_microsoft_accounts_report(report_results):
@@ -564,8 +572,11 @@ def write_microsoft_campaigns_report(report_results):
 
 def write_microsoft_search_ads_report(report_results):
     tmsa = time.time()
-
     ads_report_records_to_insert = []
+
+    # Get foreign keys
+    account_fks = get_foreign_keys("accounts")
+    microsoft_platform_fks = get_foreign_keys("microsoft_platforms")
 
     for record in report_results:
 
@@ -575,12 +586,11 @@ def write_microsoft_search_ads_report(report_results):
         else:
             report_formatted_ctr = 0.0
 
-        report_record = AdReportRecord(platform='Microsoft',
-                                       account_name=clean_country_name(record.value('AccountName')),
-                                       account_number=record.value('AccountNumber'),
-                                       time_period=record.value('TimePeriod'),
-                                       week=get_week_in_quarter(
-                                           datetime.strptime(record.value('TimePeriod'), '%Y-%m-%d')),
+        report_record = AdReportRecord(account=account_fks.get(clean_country_name(record.value('AccountName'))),
+                                       platform=microsoft_platform_fks.get(account_fks.get(clean_country_name(record.value('AccountName')))),
+                                       date=record.value('TimePeriod'),
+                                       week=get_week_in_quarter(datetime.strptime(record.value('TimePeriod'), '%Y-%m-%d')),
+                                       quarter=get_quarter_from_date(datetime.strptime(record.value('TimePeriod'), '%Y-%m-%d')),
                                        campaign=record.value('CampaignName'),
                                        currency='USD',
                                        impressions=record.value('Impressions'),
@@ -614,18 +624,21 @@ def write_microsoft_shopping_ads_report(report_results):
 
     ads_report_records_to_insert = []
 
+    # Get foreign keys
+    account_fks = get_foreign_keys("accounts")
+    microsoft_platform_fks = get_foreign_keys("microsoft_platforms")
+
     for record in report_results:
         if record.value('Ctr'):
             report_formatted_ctr = float(record.value('Ctr').strip('%'))
         else:
             report_formatted_ctr = 0.0
 
-        report_record = AdReportRecord(platform='Microsoft',
-                                       account_name=clean_country_name(record.value('AccountName')),
-                                       account_number=record.value('AccountNumber'),
-                                       time_period=record.value('TimePeriod'),
-                                       week=get_week_in_quarter(
-                                           datetime.strptime(record.value('TimePeriod'), '%Y-%m-%d')),
+        report_record = AdReportRecord(account=account_fks.get(clean_country_name(record.value('AccountName'))),
+                                       platform=microsoft_platform_fks.get(account_fks.get(clean_country_name(record.value('AccountName')))),
+                                       date=record.value('TimePeriod'),
+                                       week=get_week_in_quarter(datetime.strptime(record.value('TimePeriod'), '%Y-%m-%d')),
+                                       quarter=get_quarter_from_date(datetime.strptime(record.value('TimePeriod'), '%Y-%m-%d')),
                                        campaign=record.value('CampaignName'),
                                        currency=record.value('CurrencyCode'),
                                        impressions=record.value('Impressions'),

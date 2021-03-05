@@ -27,6 +27,7 @@ def delete_current_q_records():
     sess.query(AccountReportRecord).filter(AccountReportRecord.date >= start_of_quarter).delete(synchronize_session=False)
     sess.query(CampaignReportRecord).filter(CampaignReportRecord.date >= start_of_quarter).delete(synchronize_session=False)
     sess.query(MetricsReportRecord).filter(MetricsReportRecord.date >= start_of_quarter).delete(synchronize_session=False)
+    sess.query(AdReportRecord).filter(AdReportRecord.date >= start_of_quarter).delete(synchronize_session=False)
 
     sess.commit()
     console.print("All records for this quarter have been deleted. Carry on.", style="bold green")
@@ -46,6 +47,3 @@ def init_db(quarter, year):
     else:
         console.print("Report is not for this quarter and no records have been deleted.", style="bold green")
 
-    # ToDo : Clean up
-    # Base.metadata.drop_all(engine)
-    # Base.metadata.create_all()
