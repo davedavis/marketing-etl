@@ -2,7 +2,6 @@ from datetime import datetime
 
 from datequarter import DateQuarter
 
-
 def get_quarter_from_date(date):
     """Takes a date object and returns the fiscal quarter of that date.
         Args:
@@ -23,4 +22,3 @@ def get_start_of_quarter(date):
     return start_of_quarter
 
 
-print(get_start_of_quarter(datetime.now()))

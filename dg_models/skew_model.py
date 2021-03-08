@@ -10,7 +10,6 @@ settings = settingsfile.get_settings()
 
 
 class Skew(Base):
-    # Set the table name based on the program arguments.
     __tablename__ = 'Skew'
     __tableargs__ = {'schema': settings['db_database']}
 

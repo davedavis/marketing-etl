@@ -79,6 +79,9 @@ def build_microsoft_report_object(start_date, end_date, report_type):
 
         report_record_iterable = report_container.report_records
 
+
+        # ToDo: Remove Shopping Ads from this iterable as they are duplicated in the shopping report request.
+
         # Return the report and send to the DB write module.
         return report_record_iterable
 
@@ -95,3 +98,5 @@ def get_report(start_date, end_date, report_type):
     authenticate(authorization_data)
     records = build_microsoft_report_object(start_date, end_date, report_type)
     write_microsoft_report_to_db(records, report_type)
+
+

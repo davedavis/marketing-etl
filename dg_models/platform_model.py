@@ -9,7 +9,6 @@ settings = settingsfile.get_settings()
 
 
 class Platform(Base):
-    # Set the table name based on the program arguments.
     __tablename__ = 'Platform'
     __tableargs__ = {'schema': settings['db_database']}
 

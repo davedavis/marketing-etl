@@ -55,4 +55,4 @@ class AdReportRecord(Base):
     rsa_description_4 = Column(String(length=512))
 
     def __repr__(self):
-        return f'Ads Report: {self.platform} {self.account_name} Week: {self.week} - Spend: {self.spend}'
+        return f'Ads Report: {self.platform} {self.account} Week: {self.week} - Spend: {self.spend}'

@@ -586,29 +586,33 @@ def write_microsoft_search_ads_report(report_results):
         else:
             report_formatted_ctr = 0.0
 
-        report_record = AdReportRecord(account=account_fks.get(clean_country_name(record.value('AccountName'))),
-                                       platform=microsoft_platform_fks.get(account_fks.get(clean_country_name(record.value('AccountName')))),
-                                       date=record.value('TimePeriod'),
-                                       week=get_week_in_quarter(datetime.strptime(record.value('TimePeriod'), '%Y-%m-%d')),
-                                       quarter=get_quarter_from_date(datetime.strptime(record.value('TimePeriod'), '%Y-%m-%d')),
-                                       campaign=record.value('CampaignName'),
-                                       currency='USD',
-                                       impressions=record.value('Impressions'),
-                                       clicks=record.value('Clicks'),
-                                       spend=record.value('Spend'),
-                                       ctr=report_formatted_ctr,
-                                       average_cpc=record.value('AverageCpc'),
-                                       headline_1=record.value('TitlePart1'),
-                                       ad_type='Search',
-                                       headline_2=record.value('TitlePart2'),
-                                       headline_3=record.value('TitlePart3'),
-                                       description_1=record.value('AdDescription'),
-                                       description_2=record.value('AdDescription2'),
-                                       path_1=record.value('Path1'),
-                                       path_2=record.value('Path2'),
-                                       )
+        # Check for shopping campaigns
+        shopping_substring = "shopping"
+        if shopping_substring not in record.value('CampaignName').lower():
 
-        ads_report_records_to_insert.append(report_record)
+            report_record = AdReportRecord(account=account_fks.get(clean_country_name(record.value('AccountName'))),
+                                           platform=microsoft_platform_fks.get(account_fks.get(clean_country_name(record.value('AccountName')))),
+                                           date=record.value('TimePeriod'),
+                                           week=get_week_in_quarter(datetime.strptime(record.value('TimePeriod'), '%Y-%m-%d')),
+                                           quarter=get_quarter_from_date(datetime.strptime(record.value('TimePeriod'), '%Y-%m-%d')),
+                                           campaign=record.value('CampaignName'),
+                                           currency='USD',
+                                           impressions=record.value('Impressions'),
+                                           clicks=record.value('Clicks'),
+                                           spend=record.value('Spend'),
+                                           ctr=report_formatted_ctr,
+                                           average_cpc=record.value('AverageCpc'),
+                                           headline_1=record.value('TitlePart1'),
+                                           ad_type='Search',
+                                           headline_2=record.value('TitlePart2'),
+                                           headline_3=record.value('TitlePart3'),
+                                           description_1=record.value('AdDescription'),
+                                           description_2=record.value('AdDescription2'),
+                                           path_1=record.value('Path1'),
+                                           path_2=record.value('Path2'),
+                                           )
+
+            ads_report_records_to_insert.append(report_record)
 
     session = get_session()
     session.bulk_save_objects(ads_report_records_to_insert)

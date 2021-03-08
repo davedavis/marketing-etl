@@ -1,4 +1,5 @@
 import contextlib
+import time
 from datetime import datetime
 from rich.console import Console
 from dg_models.base_model import Base, Session, engine
@@ -22,6 +23,7 @@ def get_session():
 
 
 def delete_current_q_records():
+    deletion_function_timer = time.time()
     sess = get_session()
     start_of_quarter = get_start_of_quarter(datetime.now())
     sess.query(AccountReportRecord).filter(AccountReportRecord.date >= start_of_quarter).delete(synchronize_session=False)
@@ -31,6 +33,9 @@ def delete_current_q_records():
 
     sess.commit()
     console.print("All records for this quarter have been deleted. Carry on.", style="bold green")
+    console.print(
+        "Total time for removing current quarter records from the database was "
+        + str(time.time() - deletion_function_timer)[:-14] + " secs ")
 
 
 def init_db(quarter, year):
@@ -38,7 +43,7 @@ def init_db(quarter, year):
     console.print(f'Initializing database for {year} year')
 
     # If the report requested is for the current quarter, delete all the
-    # records for this quarter so they can be refetched. We do this as platforms
+    # records for this quarter so they can be re-fetched. We do this as platforms
     # update/adjust their metrics (particularly spend metrics) as fraudulent/invalid
     # clicks are refunded.
     if year == 'this' and quarter == get_quarter_from_date(datetime.now()):
