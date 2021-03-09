@@ -42,8 +42,9 @@ def main(quarter, year):
 
     # Truncate and setup database tables with SQLAlchemy
     console.print('Checking database integrity...')
-    init_db(quarter, year)
+    # init_db(quarter, year)
 
+    # ToDo: Implement ifexists and if start of quarter.
     # Database initialization with seed data.
     # Seed Countries to DB
     # populate_accounts()
@@ -81,6 +82,11 @@ def main(quarter, year):
 
     # Start the Adobe Revenue report flow.
     adobe_report_builder.get_report(adobe_full_date_range, report_type="emea_metrics")
+
+    # Start the Budget Cap report flow.
+    # ToDo: Check for status = PAUSED
+    # ToDo: Create a view with recommendations and sum of spend for 30 days, quarter and ROAS etc based on campaign ID.
+    google_ads_report_builder.get_report(google_date_range, report_type="budgetcap")
 
 
 if __name__ == "__main__":

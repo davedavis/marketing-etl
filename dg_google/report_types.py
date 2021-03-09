@@ -11,6 +11,9 @@ def get_report_type(report_type, date_range):
     elif report_type == 'shopping':
         report = get_shopping_ads_report_type(date_range)
 
+    elif report_type == 'budgetcap':
+        report = get_budget_opportunities_report_type(date_range)
+
     else:
         print("You need to provide a Google Ads report type like 'accounts', 'campaigns', 'ads' or 'shopping.")
         report = None
@@ -24,6 +27,16 @@ def get_account_report_type(date_range):
                          WHERE segments.date 
                          BETWEEN {date_range}
                          AND metrics.cost_micros > 0'''
+    return report_request
+
+
+def get_budget_opportunities_report_type(date_range):
+    report_request = f'''SELECT customer.descriptive_name, campaign_budget.has_recommended_budget, campaign_budget.amount_micros, campaign_budget.status,
+                         campaign_budget.recommended_budget_amount_micros, 
+                         campaign.name, campaign.id, segments.date, segments.budget_campaign_association_status.campaign, segments.budget_campaign_association_status.status
+                         FROM campaign_budget 
+                         WHERE segments.date BETWEEN {date_range}
+                         AND campaign_budget.has_recommended_budget = True'''
     return report_request
 
 

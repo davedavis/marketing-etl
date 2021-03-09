@@ -16,6 +16,7 @@
 
 
 import sys
+from functools import reduce
 
 from google.ads.google_ads.client import GoogleAdsClient
 from google.ads.google_ads.errors import GoogleAdsException
@@ -28,6 +29,7 @@ from rich.console import Console
 
 console = Console()
 settings = settingsfile.get_settings()
+
 
 def get_report(date_range, report_type):
     google_ads_client = GoogleAdsClient.load_from_storage(get_settings_file_path())
@@ -45,6 +47,7 @@ def get_report(date_range, report_type):
             for batch in response:
                 for row in batch.results:
                     records_to_insert.append(row)
+
 
         # Boilerplate exception code.
         except GoogleAdsException as ex:

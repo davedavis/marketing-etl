@@ -16,6 +16,8 @@ import time
 from datetime import datetime
 
 # Import DB utils
+from functools import reduce
+
 from google.ads.google_ads.client import GoogleAdsClient
 
 from dg_db.db_utils import get_session
@@ -90,6 +92,9 @@ def write_google_report_to_db(report_results, report_type):
 
     elif report_type == 'shopping':
         write_google_shopping_ads_report(report_results)
+
+    elif report_type == 'budgetcap':
+        write_budget_receommendation_report(report_results)
 
     else:
         console.print("You need to provide a Google Ads report type like 'accounts', 'campaigns', 'ads' or 'shopping.")
@@ -485,6 +490,24 @@ def write_google_shopping_ads_report(report_results):
 
     console.print(
         "Total time for adding Google shopping ads to the database was " + str(time.time() - tgshop)[:-14] + " secs ")
+
+
+def write_budget_receommendation_report(report_results):
+    # Create a list to contain tuples from the response that we'll add to the database.
+    budget_recommendations_to_insert = []
+
+    recommendation_dict_list = []
+    for row in report_results:
+        temp_dict = {}
+        temp_dict['Campaign Name'] = row.campaign.name
+        temp_dict['Campaign ID'] = row.campaign.id
+        temp_dict['Current Budget'] = row.campaign_budget.amount_micros / 1000000
+        temp_dict['Recommended Budget'] = row.campaign_budget.recommended_budget_amount_micros / 1000000
+        recommendation_dict_list.append(temp_dict)
+
+    reclist = reduce(lambda l, x: l.append(x) or l if x not in l else l, recommendation_dict_list, [])
+    for rec in reclist:
+        console.print(rec)
 
 
 def write_microsoft_accounts_report(report_results):
