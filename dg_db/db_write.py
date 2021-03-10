@@ -24,6 +24,7 @@ from dg_db.db_utils import get_session
 # Import models
 from dg_models.account_model import Account
 from dg_models.accounts_report_model import AccountReportRecord
+from dg_models.budget_recommendation_model import BudgetRecommendation
 from dg_models.campaigns_report_model import CampaignReportRecord
 from dg_models.ads_report_model import AdReportRecord
 
@@ -390,10 +391,12 @@ def write_google_search_ads_report(report_results):
 
         # Build the record for insertion.
         report_record = AdReportRecord(account=account_fks.get(clean_country_name(record.customer.descriptive_name)),
-                                       platform=google_platform_fks.get(account_fks.get(clean_country_name(record.customer.descriptive_name))),
+                                       platform=google_platform_fks.get(
+                                           account_fks.get(clean_country_name(record.customer.descriptive_name))),
                                        date=record.segments.date,
                                        week=get_week_in_quarter(datetime.strptime(record.segments.date, "%Y-%m-%d")),
-                                       quarter=get_quarter_from_date(datetime.strptime(record.segments.date, "%Y-%m-%d")),
+                                       quarter=get_quarter_from_date(
+                                           datetime.strptime(record.segments.date, "%Y-%m-%d")),
                                        campaign=record.campaign.name,
                                        currency=record.customer.currency_code,
                                        impressions=record.metrics.impressions,
@@ -460,10 +463,12 @@ def write_google_shopping_ads_report(report_results):
         channel = GoogleAdsClient.get_type('AdvertisingChannelTypeEnum')
 
         report_record = AdReportRecord(account=account_fks.get(clean_country_name(record.customer.descriptive_name)),
-                                       platform=google_platform_fks.get(account_fks.get(clean_country_name(record.customer.descriptive_name))),
+                                       platform=google_platform_fks.get(
+                                           account_fks.get(clean_country_name(record.customer.descriptive_name))),
                                        date=record.segments.date,
                                        week=get_week_in_quarter(datetime.strptime(record.segments.date, "%Y-%m-%d")),
-                                       quarter=get_quarter_from_date(datetime.strptime(record.segments.date, "%Y-%m-%d")),
+                                       quarter=get_quarter_from_date(
+                                           datetime.strptime(record.segments.date, "%Y-%m-%d")),
                                        campaign=record.campaign.name,
                                        currency=record.customer.currency_code,
                                        impressions=record.metrics.impressions,
@@ -493,21 +498,60 @@ def write_google_shopping_ads_report(report_results):
 
 
 def write_budget_receommendation_report(report_results):
-    # Create a list to contain tuples from the response that we'll add to the database.
-    budget_recommendations_to_insert = []
+    brr = time.time()
+    # Budget Recommendations come back from the API with a daily dimension which is not very useful
+    # as there are multiple duplicates/entries for the same campaign, showing the same recommendation
+    # for each date. What we want is to show only one recommendation fo each campaign. So we pull the
+    # the records, then deduplicate.
 
+    # Loop through the report results and add all entries, including duplicates to a list
     recommendation_dict_list = []
     for row in report_results:
         temp_dict = {}
-        temp_dict['Campaign Name'] = row.campaign.name
+        temp_dict['Account'] = row.customer.descriptive_name
         temp_dict['Campaign ID'] = row.campaign.id
+        temp_dict['Campaign Name'] = row.campaign.name
         temp_dict['Current Budget'] = row.campaign_budget.amount_micros / 1000000
         temp_dict['Recommended Budget'] = row.campaign_budget.recommended_budget_amount_micros / 1000000
         recommendation_dict_list.append(temp_dict)
 
-    reclist = reduce(lambda l, x: l.append(x) or l if x not in l else l, recommendation_dict_list, [])
-    for rec in reclist:
-        console.print(rec)
+    # Use a Lambda function to remove duplicates
+    unique_recommendations = reduce(lambda l, x: l.append(x) or l if x not in l else l, recommendation_dict_list, [])
+
+    # Then add the unique list to the DB as normal.
+    # Get foreign keys
+    account_fks = get_foreign_keys("accounts")
+    google_platform_fks = get_foreign_keys("google_platforms")
+
+    # Create a list to hold the BudgetRecommendation objects.
+    budget_recommendation_records_to_insert = []
+
+    for record in unique_recommendations:
+        report_record = BudgetRecommendation(
+            account=account_fks.get(clean_country_name(record['Account'])),
+            platform=google_platform_fks.get(account_fks.get(clean_country_name(record['Account']))),
+            campaign_id=record['Campaign ID'],
+            campaign_name=record['Campaign Name'],
+            current_budget=record['Current Budget'],
+            recommended_budget=record['Recommended Budget'],
+
+        )
+
+        # session.add(report_record)
+        budget_recommendation_records_to_insert.append(report_record)
+
+        # Set up DB session
+    session = get_session()
+    # Bulk save the records from the list
+    session.bulk_save_objects(budget_recommendation_records_to_insert)
+    # Commit the session
+    session.commit()
+    # Close the session
+    session.close()
+
+    console.print(f"{len(budget_recommendation_records_to_insert)} budget recommendations were retrieved.")
+    console.print(
+        "Total time for adding Budget Recommendations to the database was " + str(time.time() - brr)[:-14] + " secs ")
 
 
 def write_microsoft_accounts_report(report_results):
@@ -612,12 +656,14 @@ def write_microsoft_search_ads_report(report_results):
         # Check for shopping campaigns
         shopping_substring = "shopping"
         if shopping_substring not in record.value('CampaignName').lower():
-
             report_record = AdReportRecord(account=account_fks.get(clean_country_name(record.value('AccountName'))),
-                                           platform=microsoft_platform_fks.get(account_fks.get(clean_country_name(record.value('AccountName')))),
+                                           platform=microsoft_platform_fks.get(
+                                               account_fks.get(clean_country_name(record.value('AccountName')))),
                                            date=record.value('TimePeriod'),
-                                           week=get_week_in_quarter(datetime.strptime(record.value('TimePeriod'), '%Y-%m-%d')),
-                                           quarter=get_quarter_from_date(datetime.strptime(record.value('TimePeriod'), '%Y-%m-%d')),
+                                           week=get_week_in_quarter(
+                                               datetime.strptime(record.value('TimePeriod'), '%Y-%m-%d')),
+                                           quarter=get_quarter_from_date(
+                                               datetime.strptime(record.value('TimePeriod'), '%Y-%m-%d')),
                                            campaign=record.value('CampaignName'),
                                            currency='USD',
                                            impressions=record.value('Impressions'),
@@ -662,10 +708,13 @@ def write_microsoft_shopping_ads_report(report_results):
             report_formatted_ctr = 0.0
 
         report_record = AdReportRecord(account=account_fks.get(clean_country_name(record.value('AccountName'))),
-                                       platform=microsoft_platform_fks.get(account_fks.get(clean_country_name(record.value('AccountName')))),
+                                       platform=microsoft_platform_fks.get(
+                                           account_fks.get(clean_country_name(record.value('AccountName')))),
                                        date=record.value('TimePeriod'),
-                                       week=get_week_in_quarter(datetime.strptime(record.value('TimePeriod'), '%Y-%m-%d')),
-                                       quarter=get_quarter_from_date(datetime.strptime(record.value('TimePeriod'), '%Y-%m-%d')),
+                                       week=get_week_in_quarter(
+                                           datetime.strptime(record.value('TimePeriod'), '%Y-%m-%d')),
+                                       quarter=get_quarter_from_date(
+                                           datetime.strptime(record.value('TimePeriod'), '%Y-%m-%d')),
                                        campaign=record.value('CampaignName'),
                                        currency=record.value('CurrencyCode'),
                                        impressions=record.value('Impressions'),

@@ -42,7 +42,7 @@ def main(quarter, year):
 
     # Truncate and setup database tables with SQLAlchemy
     console.print('Checking database integrity...')
-    # init_db(quarter, year)
+    init_db(quarter, year)
 
     # ToDo: Implement ifexists and if start of quarter.
     # Database initialization with seed data.
