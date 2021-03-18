@@ -44,9 +44,9 @@ def main(quarter, year):
     console.print('Checking database integrity...')
     init_db(quarter, year)
 
-    # ToDo: Implement ifexists and if start of quarter.
-    # Database initialization with seed data.
-    # Seed Countries to DB
+    # # ToDo: Implement if exists and if start of quarter.
+    # # Database initialization with seed data.
+    # # Seed Countries to DB
     # populate_accounts()
     # # Seed Platforms to DB
     # populate_platforms()
@@ -91,5 +91,3 @@ def main(quarter, year):
 
 if __name__ == "__main__":
     main(4, "this")
-
-
