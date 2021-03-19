@@ -85,7 +85,6 @@ def main(quarter, year):
 
     # Start the Budget Cap report flow.
     # ToDo: Check for status = PAUSED
-    # ToDo: Create a view with recommendations and sum of spend for 30 days, quarter and ROAS etc based on campaign ID.
     google_ads_report_builder.get_report(google_date_range, report_type="budgetcap")
 
 
