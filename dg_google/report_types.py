@@ -40,7 +40,6 @@ def get_budget_opportunities_report_type(date_range):
     return report_request
 
 
-
 def get_campaign_report_type(date_range):
     report_request = f'''SELECT customer.descriptive_name, segments.date, metrics.cost_micros, metrics.clicks, 
                                 metrics.impressions, metrics.impressions, metrics.cost_per_conversion,
