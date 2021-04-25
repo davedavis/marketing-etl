@@ -16,6 +16,7 @@ class Platform(Base):
     account = Column(Integer, ForeignKey('Account.id'))
     platform = Column(String(length=64))
     account_number = Column(String(length=64))
+    new_account_number = Column(String(length=64))
 
 
     def __repr__(self):

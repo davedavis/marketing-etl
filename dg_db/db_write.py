@@ -120,6 +120,7 @@ def write_platforms(platforms):
             account=record[0],
             platform=record[1],
             account_number=record[2],
+            new_account_number=record[3],
         )
 
         platforms_to_insert.append(platform)
@@ -276,7 +277,7 @@ def write_google_accounts_report(report_results):
             quarter=get_quarter_from_date(datetime.strptime(record.segments.date, "%Y-%m-%d")),
             impressions=record.metrics.impressions,
             clicks=record.metrics.clicks,
-            spend=record.metrics.cost_micros / 1000000
+            spend=(record.metrics.cost_micros / 1000000) * settings['exchange_rate']
         )
 
         # session.add(report_record)
@@ -321,13 +322,13 @@ def write_google_campaigns_report(report_results):
             network=channel.AdvertisingChannelType.Name(record.campaign.advertising_channel_type).title(),
             impressions=record.metrics.impressions,
             clicks=record.metrics.clicks,
-            spend=record.metrics.cost_micros / 1000000,
+            spend=(record.metrics.cost_micros / 1000000) * settings['exchange_rate'],
             conversions=record.metrics.conversions,
-            cost_per_conversion=record.metrics.cost_per_conversion / 1000000,
-            value_per_conversion=record.metrics.value_per_conversion,
-            conversion_value=record.metrics.conversions_value,
+            cost_per_conversion=(record.metrics.cost_per_conversion / 1000000) * settings['exchange_rate'],
+            value_per_conversion=(record.metrics.value_per_conversion) * settings['exchange_rate'],
+            conversion_value=(record.metrics.conversions_value) * settings['exchange_rate'],
             conversion_rate=record.metrics.conversions_from_interactions_rate,
-            conversion_value_per_cost=record.metrics.conversions_value / record.metrics.cost_micros * 1000000,
+            conversion_value_per_cost=(record.metrics.conversions_value * settings['exchange_rate']) / ((record.metrics.cost_micros * 1000000) * settings['exchange_rate']),
             impression_share=record.metrics.search_impression_share,
             budget_lost_is=record.metrics.search_budget_lost_impression_share,
             rank_lost_is=record.metrics.search_rank_lost_impression_share
@@ -401,9 +402,9 @@ def write_google_search_ads_report(report_results):
                                        currency=record.customer.currency_code,
                                        impressions=record.metrics.impressions,
                                        clicks=record.metrics.clicks,
-                                       spend=record.metrics.cost_micros / 1000000,
+                                       spend=(record.metrics.cost_micros / 1000000) * settings['exchange_rate'],
                                        ctr=record.metrics.ctr * 100,
-                                       average_cpc=record.metrics.average_cpc / 1000000,
+                                       average_cpc=(record.metrics.average_cpc / 1000000) * settings['exchange_rate'],
                                        ad_type=channel.AdvertisingChannelType.Name(
                                            record.campaign.advertising_channel_type).title(),
                                        path_1=record.ad_group_ad.ad.expanded_text_ad.path1,

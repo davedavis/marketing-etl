@@ -80,13 +80,13 @@ def main(quarter, year):
     google_ads_report_builder.get_report(google_date_range, report_type="shopping")
     microsoft_ads_report_builder.get_report(bing_date_range_start, bing_date_range_end, report_type="shopping")
 
-    # Start the Adobe Revenue report flow.
+    # # Start the Adobe Revenue report flow.
     adobe_report_builder.get_report(adobe_full_date_range, report_type="emea_metrics")
-
-    # Start the Budget Cap report flow.
-    # ToDo: Check for status = PAUSED
+    #
+    # # Start the Budget Cap report flow.
+    # # ToDo: Check for status = PAUSED
     google_ads_report_builder.get_report(google_date_range, report_type="budgetcap")
 
 
 if __name__ == "__main__":
-    main(4, "this")
+    main(1, "this")
