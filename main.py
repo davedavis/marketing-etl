@@ -46,11 +46,11 @@ def main(quarter, year):
 
     # # ToDo: Implement if exists and if start of quarter.
     # # Database initialization with seed data.
-    # # Seed Countries to DB
+    # Seed Countries to DB
     # populate_accounts()
     # # Seed Platforms to DB
     # populate_platforms()
-    # # Get the Skews
+    # Get the Skews
     # populate_skews()
 
     # Set date range.
@@ -90,3 +90,4 @@ def main(quarter, year):
 
 if __name__ == "__main__":
     main(1, "this")
+

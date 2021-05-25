@@ -95,7 +95,7 @@ def write_google_report_to_db(report_results, report_type):
         write_google_shopping_ads_report(report_results)
 
     elif report_type == 'budgetcap':
-        write_budget_receommendation_report(report_results)
+        write_budget_recommendation_report(report_results)
 
     else:
         console.print("You need to provide a Google Ads report type like 'accounts', 'campaigns', 'ads' or 'shopping.")
@@ -277,7 +277,7 @@ def write_google_accounts_report(report_results):
             quarter=get_quarter_from_date(datetime.strptime(record.segments.date, "%Y-%m-%d")),
             impressions=record.metrics.impressions,
             clicks=record.metrics.clicks,
-            spend=(record.metrics.cost_micros / 1000000) * settings['exchange_rate']
+            spend=(record.metrics.cost_micros / 1000000) / settings['exchange_rate']
         )
 
         # session.add(report_record)
@@ -322,13 +322,13 @@ def write_google_campaigns_report(report_results):
             network=channel.AdvertisingChannelType.Name(record.campaign.advertising_channel_type).title(),
             impressions=record.metrics.impressions,
             clicks=record.metrics.clicks,
-            spend=(record.metrics.cost_micros / 1000000) * settings['exchange_rate'],
+            spend=(record.metrics.cost_micros / 1000000) / settings['exchange_rate'],
             conversions=record.metrics.conversions,
-            cost_per_conversion=(record.metrics.cost_per_conversion / 1000000) * settings['exchange_rate'],
+            cost_per_conversion=(record.metrics.cost_per_conversion / 1000000) / settings['exchange_rate'],
             value_per_conversion=(record.metrics.value_per_conversion) * settings['exchange_rate'],
             conversion_value=(record.metrics.conversions_value) * settings['exchange_rate'],
             conversion_rate=record.metrics.conversions_from_interactions_rate,
-            conversion_value_per_cost=(record.metrics.conversions_value * settings['exchange_rate']) / ((record.metrics.cost_micros * 1000000) * settings['exchange_rate']),
+            conversion_value_per_cost=(record.metrics.conversions_value * settings['exchange_rate']) / ((record.metrics.cost_micros * 1000000) / settings['exchange_rate']),
             impression_share=record.metrics.search_impression_share,
             budget_lost_is=record.metrics.search_budget_lost_impression_share,
             rank_lost_is=record.metrics.search_rank_lost_impression_share
@@ -402,9 +402,9 @@ def write_google_search_ads_report(report_results):
                                        currency=record.customer.currency_code,
                                        impressions=record.metrics.impressions,
                                        clicks=record.metrics.clicks,
-                                       spend=(record.metrics.cost_micros / 1000000) * settings['exchange_rate'],
+                                       spend=(record.metrics.cost_micros / 1000000) / settings['exchange_rate'],
                                        ctr=record.metrics.ctr * 100,
-                                       average_cpc=(record.metrics.average_cpc / 1000000) * settings['exchange_rate'],
+                                       average_cpc=(record.metrics.average_cpc / 1000000) / settings['exchange_rate'],
                                        ad_type=channel.AdvertisingChannelType.Name(
                                            record.campaign.advertising_channel_type).title(),
                                        path_1=record.ad_group_ad.ad.expanded_text_ad.path1,
@@ -474,7 +474,7 @@ def write_google_shopping_ads_report(report_results):
                                        currency=record.customer.currency_code,
                                        impressions=record.metrics.impressions,
                                        clicks=record.metrics.clicks,
-                                       spend=record.metrics.cost_micros / 1000000,
+                                       spend=(record.metrics.cost_micros / 1000000) / settings['exchange_rate'],
                                        ctr=record.metrics.ctr * 100,
                                        average_cpc=record.metrics.average_cpc / 1000000,
                                        ad_type=channel.AdvertisingChannelType.Name(
@@ -498,7 +498,7 @@ def write_google_shopping_ads_report(report_results):
         "Total time for adding Google shopping ads to the database was " + str(time.time() - tgshop)[:-14] + " secs ")
 
 
-def write_budget_receommendation_report(report_results):
+def write_budget_recommendation_report(report_results):
     brr = time.time()
     # Budget Recommendations come back from the API with a daily dimension which is not very useful
     # as there are multiple duplicates/entries for the same campaign, showing the same recommendation
@@ -574,7 +574,8 @@ def write_microsoft_accounts_report(report_results):
             quarter=get_quarter_from_date(datetime.strptime(record.value('TimePeriod'), '%Y-%m-%d')),
             impressions=record.value('Impressions'),
             clicks=record.value('Clicks'),
-            spend=record.value('Spend'))
+            spend=float(record.value('Spend')) / settings['exchange_rate']
+        )
 
         accounts_report_records_to_insert.append(report_record)
 
@@ -613,7 +614,7 @@ def write_microsoft_campaigns_report(report_results):
             network=record.value('Network'),
             impressions=record.value('Impressions'),
             clicks=record.value('Clicks'),
-            spend=record.value('Spend'),
+            spend=float(record.value('Spend')) / settings['exchange_rate'],
             conversions=record.value('Conversions'),
             cost_per_conversion=float('0' + record.value('CostPerConversion')),
             value_per_conversion=float('0' + record.value('RevenuePerConversion')),
@@ -669,7 +670,7 @@ def write_microsoft_search_ads_report(report_results):
                                            currency='USD',
                                            impressions=record.value('Impressions'),
                                            clicks=record.value('Clicks'),
-                                           spend=record.value('Spend'),
+                                           spend=float(record.value('Spend')) / settings['exchange_rate'],
                                            ctr=report_formatted_ctr,
                                            average_cpc=record.value('AverageCpc'),
                                            headline_1=record.value('TitlePart1'),
@@ -720,7 +721,7 @@ def write_microsoft_shopping_ads_report(report_results):
                                        currency=record.value('CurrencyCode'),
                                        impressions=record.value('Impressions'),
                                        clicks=record.value('Clicks'),
-                                       spend=record.value('Spend'),
+                                       spend=float(record.value('Spend')) / settings['exchange_rate'],
                                        ctr=report_formatted_ctr,
                                        average_cpc=record.value('AverageCpc'),
                                        ad_type='Shopping',
