@@ -1,5 +1,6 @@
 from datetime import datetime
 
+
 from datequarter import DateQuarter
 
 def get_quarter_from_date(date):

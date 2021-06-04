@@ -18,7 +18,9 @@ from datetime import datetime
 # Import DB utils
 from functools import reduce
 
-from google.ads.google_ads.client import GoogleAdsClient
+
+from google.ads.googleads.client import GoogleAdsClient
+from google.ads.googleads.errors import GoogleAdsException
 
 from dg_db.db_utils import get_session
 # Import models
@@ -304,22 +306,20 @@ def write_google_campaigns_report(report_results):
     account_fks = get_foreign_keys("accounts")
     google_platform_fks = get_foreign_keys("google_platforms")
 
-    # Get the channel ENUM from the client so we can see the specific network the ad was run on.
-    # Search, Shopping, Display, Display Select etc.
-    channel = GoogleAdsClient.get_type('AdvertisingChannelTypeEnum')
-    status = GoogleAdsClient.get_type('CampaignStatusEnum')
+
+
 
     for record in report_results:
         report_record = CampaignReportRecord(
             account=account_fks.get(clean_country_name(record.customer.descriptive_name)),
             platform=google_platform_fks.get(account_fks.get(clean_country_name(record.customer.descriptive_name))),
-            status=status.CampaignStatus.Name(record.campaign.status).title(),
+            status=record.campaign.status.name,
             date=record.segments.date,
             week=get_week_in_quarter(datetime.strptime(record.segments.date, "%Y-%m-%d")),
             quarter=get_quarter_from_date(datetime.strptime(record.segments.date, "%Y-%m-%d")),
             campaign_name=record.campaign.name,
             campaign_id=record.campaign.id,
-            network=channel.AdvertisingChannelType.Name(record.campaign.advertising_channel_type).title(),
+            network=record.campaign.advertising_channel_type.name,
             impressions=record.metrics.impressions,
             clicks=record.metrics.clicks,
             spend=(record.metrics.cost_micros / 1000000) / settings['exchange_rate'],
@@ -375,10 +375,6 @@ def write_google_search_ads_report(report_results):
             for description_pos, rsa_description in enumerate(record.ad_group_ad.ad.responsive_search_ad.descriptions):
                 rsa_description_list[description_pos] = rsa_description.text
 
-        # Get the channel ENUM from the client so we can see the specific network the ad was run on.
-        # Search, Shopping, Display, Display Select etc.
-        channel = GoogleAdsClient.get_type('AdvertisingChannelTypeEnum')
-
         # Switch descriptions for DSAs and normal ETAs
         if record.ad_group_ad.ad.expanded_dynamic_search_ad.description:
             description1 = record.ad_group_ad.ad.expanded_dynamic_search_ad.description
@@ -405,8 +401,7 @@ def write_google_search_ads_report(report_results):
                                        spend=(record.metrics.cost_micros / 1000000) / settings['exchange_rate'],
                                        ctr=record.metrics.ctr * 100,
                                        average_cpc=(record.metrics.average_cpc / 1000000) / settings['exchange_rate'],
-                                       ad_type=channel.AdvertisingChannelType.Name(
-                                           record.campaign.advertising_channel_type).title(),
+                                       ad_type=record.campaign.advertising_channel_type.name,
                                        path_1=record.ad_group_ad.ad.expanded_text_ad.path1,
                                        path_2=record.ad_group_ad.ad.expanded_text_ad.path2,
                                        headline_1=record.ad_group_ad.ad.expanded_text_ad.headline_part1,
@@ -459,9 +454,6 @@ def write_google_shopping_ads_report(report_results):
     google_platform_fks = get_foreign_keys("google_platforms")
 
     for record in report_results:
-        # Get the channel ENUM from the client so we can see the specific network the ad was run on.
-        # Search, Shopping, Display, Display Select etc.
-        channel = GoogleAdsClient.get_type('AdvertisingChannelTypeEnum')
 
         report_record = AdReportRecord(account=account_fks.get(clean_country_name(record.customer.descriptive_name)),
                                        platform=google_platform_fks.get(
@@ -477,8 +469,7 @@ def write_google_shopping_ads_report(report_results):
                                        spend=(record.metrics.cost_micros / 1000000) / settings['exchange_rate'],
                                        ctr=record.metrics.ctr * 100,
                                        average_cpc=record.metrics.average_cpc / 1000000,
-                                       ad_type=channel.AdvertisingChannelType.Name(
-                                           record.campaign.advertising_channel_type).title(),
+                                       ad_type=record.campaign.advertising_channel_type.name,
                                        shopping_title=record.segments.product_title
                                        )
 

@@ -18,8 +18,9 @@
 import sys
 from functools import reduce
 
-from google.ads.google_ads.client import GoogleAdsClient
-from google.ads.google_ads.errors import GoogleAdsException
+
+from google.ads.googleads.client import GoogleAdsClient
+from google.ads.googleads.errors import GoogleAdsException
 
 from dg_config import settingsfile
 from dg_config.settingsfile import get_settings_file_path
@@ -33,14 +34,20 @@ settings = settingsfile.get_settings()
 
 def get_report(date_range, report_type):
     google_ads_client = GoogleAdsClient.load_from_storage(get_settings_file_path())
-    ga_service = google_ads_client.get_service('GoogleAdsService', version='v6')
+    ga_service = google_ads_client.get_service('GoogleAdsService', version='v7')
     console.print(f"Fetching the Google Ads {report_type} reports...")
     query = get_report_type(report_type, date_range)
 
     records_to_insert = []
 
     for account in settings['google_accounts']:
-        response = ga_service.search_stream(str(account), query)
+
+        # Issues a search request using streaming.
+        search_request = google_ads_client.get_type("SearchGoogleAdsStreamRequest")
+        search_request.customer_id = str(account)
+        search_request.query = query
+        response = ga_service.search_stream(search_request)
+        # response = ga_service.search_stream(str(account), query)
 
         # Get the data from the API
         try:
