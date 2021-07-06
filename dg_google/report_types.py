@@ -22,11 +22,7 @@ def get_report_type(report_type, date_range):
 
 
 def get_account_report_type(date_range):
-    report_request = f'''SELECT customer.descriptive_name, segments.date, metrics.cost_micros, metrics.clicks, metrics.impressions
-                         FROM customer 
-                         WHERE segments.date 
-                         BETWEEN {date_range}
-                         AND metrics.cost_micros > 0'''
+    report_request = f'''SELECT customer.descriptive_name, segments.date, metrics.cost_micros, metrics.clicks, metrics.impressions FROM customer WHERE segments.date BETWEEN {date_range} AND metrics.cost_micros > 0'''
     return report_request
 
 
@@ -55,7 +51,8 @@ def get_campaign_report_type(date_range):
 
 
 def get_search_ads_report_type(date_range):
-    report_request = f'''SELECT campaign.name, ad_group.name, customer.id, customer.descriptive_name,
+    report_request = \
+        f'''SELECT campaign.name, ad_group.name, customer.id, customer.descriptive_name,
                         campaign.advertising_channel_type,
                         segments.date,
                         ad_group_ad.ad.expanded_text_ad.headline_part1,

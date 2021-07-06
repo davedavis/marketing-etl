@@ -16,7 +16,6 @@
 
 
 import sys
-from functools import reduce
 
 
 from google.ads.googleads.client import GoogleAdsClient
@@ -34,7 +33,7 @@ settings = settingsfile.get_settings()
 
 def get_report(date_range, report_type):
     google_ads_client = GoogleAdsClient.load_from_storage(get_settings_file_path())
-    ga_service = google_ads_client.get_service('GoogleAdsService', version='v7')
+    ga_service = google_ads_client.get_service('GoogleAdsService', version='v8')
     console.print(f"Fetching the Google Ads {report_type} reports...")
     query = get_report_type(report_type, date_range)
 
@@ -44,6 +43,7 @@ def get_report(date_range, report_type):
 
         # Issues a search request using streaming.
         search_request = google_ads_client.get_type("SearchGoogleAdsStreamRequest")
+        # search_request.customer_id = bytearray(account)
         search_request.customer_id = str(account)
         search_request.query = query
         response = ga_service.search_stream(search_request)
@@ -68,3 +68,4 @@ def get_report(date_range, report_type):
             sys.exit(1)
 
     write_google_report_to_db(records_to_insert, report_type)
+

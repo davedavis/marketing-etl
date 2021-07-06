@@ -27,6 +27,11 @@ ALL_AD_TYPES = {
 
 
 def authenticate(authorization_data):
+    # import logging
+    # logging.basicConfig(level=logging.INFO)
+    # logging.getLogger('suds.client').setLevel(logging.DEBUG)
+    # logging.getLogger('suds.transport.http').setLevel(logging.DEBUG)
+
     customer_service = ServiceClient(
         service='CustomerManagementService',
         version=13,
@@ -56,10 +61,10 @@ def authenticate_with_oauth(authorization_data):
     )
 
     # It is recommended that you specify a non guessable 'state' request parameter to help prevent
-    # cross site request forgery (CSRF). 
+    # cross site request forgery (CSRF).
     authentication.state = CLIENT_STATE
 
-    # Assign this authentication instance to the authorization_data. 
+    # Assign this authentication instance to the authorization_data.
     authorization_data.authentication = authentication
 
     # Register the callback function to automatically save the refresh token anytime it is refreshed.
@@ -75,7 +80,7 @@ def authenticate_with_oauth(authorization_data):
         else:
             request_user_consent(authorization_data)
     except OAuthTokenRequestException:
-        # The user could not be authenticated or the grant is expired. 
+        # The user could not be authenticated or the grant is expired.
         # The user must first sign in and if needed grant the client application access to the requested scope.
         request_user_consent(authorization_data)
 
@@ -104,9 +109,9 @@ def request_user_consent(authorization_data):
 
 
 def get_refresh_token():
-    """
+    '''
     Returns a refresh token if stored locally.
-    """
+    '''
     file = None
     try:
         file = open(REFRESH_TOKEN)
@@ -120,9 +125,9 @@ def get_refresh_token():
 
 
 def save_refresh_token(oauth_tokens):
-    """
+    '''
     Stores a refresh token locally. Be sure to save your refresh token securely.
-    """
+    '''
     with open(REFRESH_TOKEN, "w+") as file:
         file.write(oauth_tokens.refresh_token)
         file.close()
@@ -130,15 +135,14 @@ def save_refresh_token(oauth_tokens):
 
 
 def search_accounts_by_user_id(customer_service, user_id):
-    """
+    '''
     Search for account details by UserId.
 
-    :param customer_service: built customer service object
     :param user_id: The Bing Ads user identifier.
     :type user_id: long
     :return: List of accounts that the user can manage.
     :rtype: Dictionary of AdvertiserAccount
-    """
+    '''
 
     predicates = {
         'Predicate': [
@@ -156,7 +160,7 @@ def search_accounts_by_user_id(customer_service, user_id):
     PAGE_SIZE = 100
     found_last_page = False
 
-    while not found_last_page:
+    while (not found_last_page):
         paging = set_elements_to_none(customer_service.factory.create('ns5:Paging'))
         paging.Index = page_index
         paging.Size = PAGE_SIZE
@@ -178,11 +182,11 @@ def search_accounts_by_user_id(customer_service, user_id):
 
 
 def set_elements_to_none(suds_object):
-    # Bing Ads Campaign Management service operations require that if you specify a non-primitive, 
-    # it must be one of the values defined by the service i.e. it cannot be a nil element. 
-    # Since SUDS requires non-primitives and Bing Ads won't accept nil elements in place of an enum value, 
-    # you must either set the non-primitives or they must be set to None. Also in case new properties are added 
-    # in a future service release, it is a good practice to set each element of the SUDS object to None as a baseline. 
+    # Bing Ads Campaign Management service operations require that if you specify a non-primitive,
+    # it must be one of the values defined by the service i.e. it cannot be a nil element.
+    # Since SUDS requires non-primitives and Bing Ads won't accept nil elements in place of an enum value,
+    # you must either set the non-primitives or they must be set to None. Also in case new properties are added
+    # in a future service release, it is a good practice to set each element of the SUDS object to None as a baseline.
 
     for (element) in suds_object:
         suds_object.__setitem__(element[0], None)
