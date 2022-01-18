@@ -15,6 +15,8 @@ with the data once it's loaded, is up to you. Sample DB views for paid
 media program managers will be provided in the example directory. If you
 are interested in the post ETL application, please see my other repos.
 
+
+
 # DB Requirements
 
 This app is quite flexible on DB choice. However, If you're using MySQL
